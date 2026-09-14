@@ -1,3 +1,5 @@
+'use client';
+
 import { EmptyState } from '@kairos/ui';
 
 import type { HeroSlide } from '../../content/contract';
