@@ -65,12 +65,10 @@ export function NavItem({
         aria-current={current ? 'page' : undefined}
         className={cx(
           'block rounded-md px-3 py-2 text-body-sm font-medium',
-          inverse
-            ? current
-              ? 'bg-ivory text-aubergine'
-              : 'text-ivory hover:bg-ivory/10'
-            : current
-              ? 'bg-soft-green text-botanical'
+          current
+            ? 'bg-botanical text-ivory'
+            : inverse
+              ? 'text-ivory hover:bg-ivory/10'
               : 'text-botanical hover:bg-soft-green',
         )}
       >

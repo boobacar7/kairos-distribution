@@ -7,12 +7,15 @@ import { describe, expect, it } from 'vitest';
 import {
   APPROVED_PAIRS,
   contrastRatio,
+  isApprovedPair,
   meetsWcagAa,
   PALETTE,
   PALETTE_CSS_NAMES,
   paletteContrast,
+  TYPEFACES,
   WCAG_AA_LARGE_TEXT,
   WCAG_AA_TEXT,
+  WCAG_AA_UI,
 } from './index.js';
 import { PALETTE_HEXES } from './palette.js';
 
@@ -93,6 +96,27 @@ describe('contrast matrix', () => {
     const ivoryOnCoral = contrastRatio(PALETTE.ivory, PALETTE.coral);
     expect(inkOnCoral).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
     expect(ivoryOnCoral).toBeLessThan(WCAG_AA_TEXT);
+  });
+
+  it('uses ink, not ivory, as the CTA focus ring on coral', () => {
+    expect(paletteContrast('ink', 'coral')).toBeGreaterThanOrEqual(WCAG_AA_UI);
+    expect(paletteContrast('ivory', 'coral')).toBeLessThan(WCAG_AA_UI);
+    expect(isApprovedPair('ink', 'coral', 'ui')).toBe(true);
+    expect(THEME_CSS).toContain('--color-ring-cta:');
+    expect(THEME_CSS).toContain('[data-cta]:focus-visible');
+  });
+
+  it('keeps botanical as a fill on aubergine, not as text', () => {
+    expect(paletteContrast('botanical', 'aubergine')).toBeLessThan(WCAG_AA_TEXT);
+    expect(paletteContrast('ivory', 'botanical')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
+    expect(paletteContrast('ivory', 'aubergine')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
+  });
+
+  it('locks the approved typefaces', () => {
+    expect(TYPEFACES.sans).toBe('Manrope');
+    expect(TYPEFACES.serif).toBe('DM Serif Display');
+    expect(THEME_CSS).toContain("'Manrope Variable'");
+    expect(THEME_CSS).toContain("'DM Serif Display'");
   });
 
   it('keeps default body text well above AA on ivory', () => {

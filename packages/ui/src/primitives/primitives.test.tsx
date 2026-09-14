@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button } from './Button.js';
 import { Dialog } from './Dialog.js';
 import { TextField } from './Field.js';
+import { NavItem, SideNav } from './Nav.js';
 
 describe('Button', () => {
   it('exposes its label and a visible focus target', async () => {
@@ -37,6 +38,37 @@ describe('Button', () => {
     expect(screen.getByRole('status')).toHaveTextContent('[TEST] Loading');
     await user.click(button);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('paints the cta variant coral with ink text and a CTA focus hook', () => {
+    render(<Button variant="cta">[TEST] Shop</Button>);
+    const button = screen.getByRole('button', { name: '[TEST] Shop' });
+    expect(button).toHaveAttribute('data-variant', 'cta');
+    expect(button).toHaveAttribute('data-cta');
+    expect(button.className).toContain('bg-coral');
+    expect(button.className).toContain('text-ink');
+  });
+});
+
+describe('NavItem', () => {
+  it('uses botanical fill and ivory text for selected storefront and admin items', () => {
+    render(
+      <div>
+        <NavItem href="#shop" current>
+          [TEST] Shop
+        </NavItem>
+        <SideNav label="[TEST] Admin">
+          <NavItem href="#orders" current inverse>
+            [TEST] Orders
+          </NavItem>
+        </SideNav>
+      </div>,
+    );
+    for (const name of ['[TEST] Shop', '[TEST] Orders']) {
+      const link = screen.getByRole('link', { name });
+      expect(link.className).toContain('bg-botanical');
+      expect(link.className).toContain('text-ivory');
+    }
   });
 });
 

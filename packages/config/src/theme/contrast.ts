@@ -98,6 +98,13 @@ export const APPROVED_PAIRS: readonly ContrastPair[] = [
     notes: 'The only accessible text colour on coral. Ivory-on-coral fails AA for body text.',
   },
   {
+    foreground: 'ink',
+    background: 'coral',
+    role: 'ui',
+    notes:
+      'Hero / shop CTA focus ring. Ivory ring on coral fails 3:1; `data-cta` uses --color-ring-cta (ink).',
+  },
+  {
     foreground: 'botanical',
     background: 'ivory',
     role: 'text',

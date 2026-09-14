@@ -5,8 +5,9 @@
  * Hex values here must match packages/config/src/theme/palette.ts — the css-contract test
  * fails the build if they drift.
  *
- * Fonts: Manrope (interface) + DM Serif Display (headings). font-display: swap is set by
- * fontsource. Apps should preload the latin woff2 files in their document head.
+ * Fonts: Manrope (interface) + DM Serif Display (headings) — Bob approved 2026-09-14.
+ * font-display: swap is set by fontsource. Apps should preload the latin woff2 files
+ * in their document head.
  */
 
 @import '@fontsource-variable/manrope/wght.css';
@@ -36,6 +37,8 @@
   --color-border: var(--color-beige);
   --color-ring: var(--color-botanical);
   --color-ring-inverse: var(--color-ivory);
+  /* Ivory ring fails 3:1 on coral. Hero / shop CTAs (`data-cta`) use ink. */
+  --color-ring-cta: var(--color-ink);
   --color-danger: var(--color-coral);
   --color-cta: var(--color-coral);
 
@@ -114,6 +117,11 @@ body {
 [data-surface='inverse']:focus-visible,
 [data-surface='inverse'] :focus-visible {
   outline-color: var(--color-ring-inverse);
+}
+
+[data-surface='inverse'] [data-cta]:focus-visible,
+[data-cta]:focus-visible {
+  outline-color: var(--color-ring-cta);
 }
 
 @media (prefers-reduced-motion: reduce) {

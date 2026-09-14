@@ -7,7 +7,7 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<AlertTone, string> = {
   info: 'bg-soft-green border-botanical text-ink',
-  success: 'bg-soft-green border-botanical text-ink',
+  success: 'bg-soft-green border-botanical text-botanical',
   warning: 'bg-beige border-beige text-ink',
   danger: 'bg-coral border-coral text-ink',
 };
