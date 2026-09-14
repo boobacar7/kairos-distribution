@@ -70,6 +70,7 @@ export function publishedHome(
     featuredProducts: products(raw.featuredProducts),
     bestsellers: products(raw.bestsellers),
     reviews: raw.reviews.filter((review) => review.verified),
+    reviewsSummary: raw.reviewsSummary ?? null,
     banners: raw.banners
       .filter(
         (banner) =>

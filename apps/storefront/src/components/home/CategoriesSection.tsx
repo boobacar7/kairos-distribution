@@ -1,43 +1,61 @@
-import { Card, CardBody, CardMedia, CardTitle, EmptyState } from '@kairos/ui';
+import { EmptyState } from '@kairos/ui';
+import type { ComponentType } from 'react';
 
 import type { CategoryCard } from '../../content/contract';
 import { t } from '../../messages/t';
-import { HomeSection } from './HomeSection';
+import { CapsuleGlyph, CupGlyph, GiftGlyph, LeafGlyph } from '../shell/icons';
+
+const ICON_BY_SLUG: Record<string, { Icon: ComponentType<{ className?: string }>; tone: string }> = {
+  'beaute-soins': { Icon: LeafGlyph, tone: 'bg-soft-green text-botanical' },
+  'thes-infusions': { Icon: CupGlyph, tone: 'bg-beige text-botanical' },
+  capsules: { Icon: CapsuleGlyph, tone: 'bg-coral text-ink' },
+  packs: { Icon: GiftGlyph, tone: 'bg-powder-pink text-botanical' },
+};
 
 export function CategoriesSection({ categories }: { categories: readonly CategoryCard[] }) {
+  if (categories.length === 0) {
+    return (
+      <section aria-label={t('home.categories')} className="px-gutter py-6 md:px-gutter-lg">
+        <div className="mx-auto max-w-7xl">
+          <EmptyState title={t('empty.categories')} />
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <HomeSection id="categories" title={t('home.categories')}>
-      {categories.length === 0 ? (
-        <EmptyState title={t('empty.categories')} />
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
+    <section aria-label={t('home.categories')} className="px-gutter py-5 md:px-gutter-lg md:py-6">
+      <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-2 md:gap-8">
+        {categories.map((category) => {
+          const visual = ICON_BY_SLUG[category.slug] ?? {
+            Icon: LeafGlyph,
+            tone: 'bg-soft-green text-botanical',
+          };
+          const Icon = visual.Icon;
+          return (
             <li key={category.id}>
-              <Card as="div">
-                <a href={`/boutique/${category.slug}`} className="block">
-                  <CardMedia>
-                    {category.image ? (
-                      <img
-                        src={category.image.url}
-                        alt={category.image.alt}
-                        width={category.image.width ?? 600}
-                        height={category.image.height ?? 750}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span className="bg-soft-green block h-full min-h-40 w-full" />
-                    )}
-                  </CardMedia>
-                  <CardBody>
-                    <CardTitle>{category.name}</CardTitle>
-                  </CardBody>
-                </a>
-              </Card>
+              <a
+                href={`/boutique/${category.slug}`}
+                className="flex flex-col items-center gap-2 text-center md:flex-row md:gap-4 md:text-left"
+              >
+                <span
+                  className={`inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full md:h-16 md:w-16 ${visual.tone}`}
+                >
+                  <Icon className="h-7 w-7" />
+                </span>
+                <span>
+                  <span className="text-botanical block text-body-sm font-semibold md:text-body">
+                    {category.name}
+                  </span>
+                  {category.subtitle ? (
+                    <span className="text-botanical/70 block text-caption">{category.subtitle}</span>
+                  ) : null}
+                </span>
+              </a>
             </li>
-          ))}
-        </ul>
-      )}
-    </HomeSection>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

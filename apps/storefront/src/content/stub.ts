@@ -12,6 +12,7 @@ function emptyHome(): HomeContent {
     featuredProducts: [],
     bestsellers: [],
     reviews: [],
+    reviewsSummary: null,
     banners: [],
     testimonials: [],
     faq: [],

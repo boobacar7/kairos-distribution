@@ -41,7 +41,8 @@ export type Env = z.infer<typeof envSchema>;
  * require `DATABASE_URL` (architecture.md §3.2 — Prisma is API-only).
  *
  * `KAIROS_API_URL` is optional until BACKEND/CMS land. When it is unset the storefront consumes
- * the typed CMS stub (empty / schedule-filtered), so empty states are real rather than merchandised.
+ * the approved visual homepage stub (or the labelled `[TEST]` catalogue when that flag is on).
+ * Empty CMS payloads still render per-section empty states.
  */
 export const storefrontEnvSchema = baseEnvSchema.extend({
   KAIROS_API_URL: z.string().url().optional(),

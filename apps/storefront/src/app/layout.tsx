@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { MobileBottomNav } from '../components/shell/MobileBottomNav';
 import { StorefrontFooter } from '../components/shell/StorefrontFooter';
 import { StorefrontHeader } from '../components/shell/StorefrontHeader';
+import { WhatsAppFab } from '../components/shell/WhatsAppFab';
 import type { FooterContent } from '../content/contract';
 import { loadHomeContent } from '../content/load-home';
 import { t } from '../messages/t';
@@ -51,6 +52,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           {children}
         </main>
         <StorefrontFooter footer={footer} />
+        <WhatsAppFab />
         <MobileBottomNav />
       </body>
     </html>

@@ -4,3 +4,77 @@
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 @source './**/*.{ts,tsx}';
 @source '../**/*.{ts,tsx}';
+
+/*
+ * Homepage hero uses the CMS carousel primitive. The approved frames are photographic
+ * banners with botanical copy already in the crop, muted chrome, and botanical dots —
+ * not the inverse botanical slab the primitive ships with. Overrides stay on tokens.
+ */
+.home-hero [data-surface='inverse'] {
+  background-color: transparent;
+  color: var(--color-botanical);
+  border-radius: var(--radius-xl);
+}
+
+.home-hero [data-surface='inverse'] .relative.min-h-72,
+.home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
+  min-height: 16.5rem;
+}
+
+@media (min-width: 48rem) {
+  .home-hero [data-surface='inverse'] .relative.min-h-72,
+  .home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
+    min-height: 18.5rem;
+  }
+}
+
+.home-hero [data-surface='inverse'] h2,
+.home-hero [data-surface='inverse'] p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.home-hero [data-surface='inverse'] a[data-cta] {
+  border-radius: var(--radius-full);
+  padding-inline: 1.25rem;
+}
+
+.home-hero [role='toolbar'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.home-hero [role='toolbar']:focus-within {
+  clip: auto;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  right: 1rem;
+  bottom: 1rem;
+}
+
+.home-hero [aria-roledescription='carousel'] ul.absolute button {
+  background-color: var(--color-botanical);
+  opacity: 0.28;
+}
+
+.home-hero [aria-roledescription='carousel'] ul.absolute button[aria-current='true'] {
+  opacity: 1;
+}
+
+.storefront-footer-light footer {
+  background-color: var(--color-ivory);
+  color: var(--color-botanical);
+  border-top: 1px solid var(--color-beige);
+  margin-top: 1.5rem;
+}

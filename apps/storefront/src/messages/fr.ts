@@ -7,6 +7,8 @@
 export const messages = {
   'brand.name': 'Kairos',
   'brand.fullName': 'Kairos Distributions',
+  'brand.distributions': 'Distributions',
+  'brand.tagline': 'Beauté naturelle pour un quotidien meilleur',
 
   'a11y.skip': 'Aller au contenu',
   'a11y.loading': 'Chargement',
@@ -17,10 +19,17 @@ export const messages = {
   'nav.closeMenu': 'Fermer le menu',
   'nav.home': 'Accueil',
   'nav.shop': 'Boutique',
+  'nav.promotions': 'Promotions',
+  'nav.reviews': 'Avis',
   'nav.faq': 'FAQ',
   'nav.contact': 'Contact',
   'nav.account': 'Compte',
   'nav.cart': 'Panier',
+  'nav.orders': 'Commandes',
+  'nav.search': 'Rechercher',
+  'nav.whatsapp': 'WhatsApp',
+  'currency.code': 'XOF',
+  'currency.label': 'Devise',
 
   'cart.icon': 'Panier',
   'cart.count': '{count} article(s) dans le panier',
@@ -31,7 +40,9 @@ export const messages = {
   'home.featured': 'Produits phares',
   'home.bestsellers': 'Incontournables',
   'home.reviews': 'Avis vérifiés',
+  'home.seeAll': 'Voir tout',
   'home.promo': 'Offres',
+  'home.promoCode': 'Code',
   'home.testimonials': 'Témoignages',
   'home.faq': 'Questions fréquentes',
 
@@ -62,12 +73,16 @@ export const messages = {
 
   'footer.label': 'Pied de page',
   'footer.legal': 'Informations légales',
+  'footer.about': 'À propos',
+  'footer.service': 'Service client',
   'footer.delivery': 'Livraison',
   'footer.returns': 'Retours',
   'footer.privacy': 'Confidentialité',
   'footer.terms': 'Conditions générales',
-  'footer.contact': 'Contact',
+  'footer.contact': 'Nous contacter',
   'footer.faq': 'FAQ',
+  'footer.copyright': '© 2024 Kairos Distributions. Tous droits réservés.',
+  'footer.social': 'Réseaux sociaux',
 
   'meta.title': 'Kairos Distributions',
   'meta.description': 'Boutique Kairos Distributions.',
@@ -75,6 +90,8 @@ export const messages = {
   'pages.shop.title': 'Boutique',
   'pages.cart.title': 'Panier',
   'pages.account.title': 'Compte',
+  'pages.orders.title': 'Commandes',
+  'pages.about.title': 'À propos',
   'pages.faq.title': 'FAQ',
   'pages.contact.title': 'Contact',
   'pages.delivery.title': 'Livraison',
@@ -86,6 +103,11 @@ export const messages = {
 
   'reviews.verified': 'Achat vérifié',
   'reviews.rating': 'Note {value} sur 5',
+  'reviews.aggregate': '{value}/5 sur plus de {count} avis',
+  'reviews.more': '+{count}',
+
+  'product.add': 'Voir {name}',
+  'product.stars': '({count})',
 
   'stock.inStock': 'En stock',
   'stock.out': 'Indisponible',

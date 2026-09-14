@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { t } from '../../messages/t';
@@ -12,20 +11,22 @@ describe('storefront shell', () => {
     render(<StorefrontHeader />);
     expect(screen.getAllByRole('link', { name: t('nav.home') }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: t('nav.shop') }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('link', { name: t('nav.promotions') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.reviews') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.search') })).toHaveAttribute('href', '/boutique');
     expect(screen.getByRole('link', { name: t('cart.icon') })).toHaveAttribute('href', '/panier');
   });
 
-  it('opens the mobile menu sheet from the header button', async () => {
-    const user = userEvent.setup();
+  it('does not render a hamburger control', () => {
     render(<StorefrontHeader />);
-    await user.click(screen.getByRole('button', { name: t('nav.menu') }));
-    expect(screen.getByRole('heading', { name: t('nav.menu') })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t('nav.menu') })).not.toBeInTheDocument();
   });
 
-  it('renders mobile bottom navigation destinations', () => {
+  it('renders five mobile bottom navigation destinations', () => {
     render(<MobileBottomNav />);
     expect(screen.getByRole('navigation', { name: t('nav.mobile') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.cart') })).toHaveAttribute('href', '/panier');
+    expect(screen.getByRole('link', { name: t('nav.orders') })).toHaveAttribute('href', '/commandes');
   });
 
   it('hides the cart count when empty', () => {

@@ -52,6 +52,7 @@ export const categoryCardSchema = z.object({
   id: z.string().min(1),
   slug: slugSchema,
   name: z.string().min(1),
+  subtitle: z.string().nullable().optional(),
   image: mediaRefSchema.nullable().optional(),
   position: z.number().int().default(0),
 });
@@ -61,6 +62,7 @@ export const featuredProductSchema = z.object({
   id: z.string().min(1),
   slug: slugSchema,
   name: z.string().min(1),
+  subtitle: z.string().nullable().optional(),
   variantId: z.string().min(1),
   price: moneySchema,
   compareAtPrice: moneySchema.nullable().optional(),
@@ -81,10 +83,23 @@ export const verifiedReviewSchema = z.object({
 });
 export type VerifiedReview = z.infer<typeof verifiedReviewSchema>;
 
+export const reviewsSummarySchema = z.object({
+  headline: z.string().min(1),
+  supporting: z.string().nullable().optional(),
+  averageRating: z.number().min(0).max(5),
+  reviewCount: z.number().int().nonnegative(),
+  additionalCount: z.number().int().nonnegative().optional(),
+  avatars: z.array(mediaRefSchema).default([]),
+});
+export type ReviewsSummary = z.infer<typeof reviewsSummarySchema>;
+
 export const promoBannerSchema = z.object({
   id: z.string().min(1),
   title: z.string(),
   subtitle: z.string().nullable().optional(),
+  eyebrow: z.string().nullable().optional(),
+  highlight: z.string().nullable().optional(),
+  code: z.string().nullable().optional(),
   ctaLabel: z.string().nullable().optional(),
   ctaUrl: z.string().nullable().optional(),
   image: mediaRefSchema.nullable().optional(),
@@ -164,6 +179,7 @@ export const homeContentSchema = z.object({
   featuredProducts: z.array(featuredProductSchema).default([]),
   bestsellers: z.array(featuredProductSchema).default([]),
   reviews: z.array(verifiedReviewSchema).default([]),
+  reviewsSummary: reviewsSummarySchema.nullable().optional(),
   banners: z.array(promoBannerSchema).default([]),
   testimonials: z.array(testimonialSchema).default([]),
   faq: z.array(faqItemSchema).default([]),

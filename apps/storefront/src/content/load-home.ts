@@ -7,6 +7,7 @@ import { parseStorefrontEnv } from '@kairos/config';
 import { parseHomePayload, type HomeContent } from './contract';
 import { publishedHome } from './published-content';
 import { buildStubHome } from './stub';
+import { buildVisualHome } from './visual-home';
 
 export const HOME_REVALIDATE_SECONDS = 300;
 
@@ -32,7 +33,9 @@ async function loadHomeUncached(now = new Date()): Promise<HomeContent> {
 
   const raw = env.KAIROS_API_URL
     ? parseHomePayload(await fetchHomeFromApi(env.KAIROS_API_URL))
-    : buildStubHome({ useTestCatalogue: testAllowed });
+    : testAllowed
+      ? buildStubHome({ useTestCatalogue: true })
+      : buildVisualHome();
 
   return publishedHome(raw, now, { allowTestCatalogue: testAllowed });
 }

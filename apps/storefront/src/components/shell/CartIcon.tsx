@@ -13,7 +13,7 @@ export function CartIcon({ count = 0 }: { count?: number }) {
       <CartGlyph />
       {count > 0 ? (
         <span
-          className="bg-botanical text-ivory absolute top-1 right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-caption font-semibold"
+          className="bg-coral text-ink absolute top-1 right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-caption font-semibold"
           aria-hidden="true"
         >
           {count}

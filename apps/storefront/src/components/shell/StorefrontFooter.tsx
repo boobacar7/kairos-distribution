@@ -2,34 +2,31 @@ import { Footer } from '@kairos/ui';
 
 import type { FooterContent } from '../../content/contract';
 import { t } from '../../messages/t';
+import { BrandMark } from './BrandMark';
+import { FacebookGlyph, InstagramGlyph, YoutubeGlyph } from './icons';
 
-const LEGAL = [
-  { href: '/livraison', key: 'footer.delivery' as const },
-  { href: '/retours', key: 'footer.returns' as const },
-  { href: '/faq', key: 'footer.faq' as const },
-  { href: '/contact', key: 'footer.contact' as const },
-  { href: '/confidentialite', key: 'footer.privacy' as const },
-  { href: '/conditions', key: 'footer.terms' as const },
-] as const;
+function SocialIcon({ platform }: { platform: string }) {
+  if (platform === 'facebook') return <FacebookGlyph />;
+  if (platform === 'instagram') return <InstagramGlyph />;
+  if (platform === 'youtube') return <YoutubeGlyph />;
+  return <span className="text-caption">{platform}</span>;
+}
 
 export function StorefrontFooter({ footer }: { footer: FooterContent }) {
-  const hasCms = footer.sections.length > 0 || footer.social.length > 0;
+  const links = footer.sections.flatMap((section) => section.links);
 
   return (
-    <Footer label={t('footer.label')}>
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
-        <div className="space-y-2">
-          <p className="font-serif text-h3">{t('brand.fullName')}</p>
-        </div>
-        {footer.sections.map((section) => (
-          <div key={section.id} className="space-y-2">
-            <p className="text-body-sm font-semibold tracking-wide uppercase">{section.title}</p>
-            <ul className="space-y-1">
-              {section.links.map((link) => (
+    <div className="storefront-footer-light">
+      <Footer label={t('footer.label')}>
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <BrandMark compact />
+          {links.length > 0 ? (
+            <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              {links.map((link) => (
                 <li key={link.id}>
                   <a
                     href={link.url}
-                    className="text-ivory/90 hover:text-ivory text-body-sm"
+                    className="text-botanical text-body-sm"
                     target={link.opensInNewTab ? '_blank' : undefined}
                     rel={link.opensInNewTab ? 'noreferrer' : undefined}
                   >
@@ -38,33 +35,31 @@ export function StorefrontFooter({ footer }: { footer: FooterContent }) {
                 </li>
               ))}
             </ul>
+          ) : (
+            <p className="text-body-sm text-botanical/80">{t('empty.footer')}</p>
+          )}
+          <div className="flex flex-col items-start gap-3 md:items-end">
+            {footer.social.length > 0 ? (
+              <ul className="flex items-center gap-3" aria-label={t('footer.social')}>
+                {footer.social.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.url}
+                      className="text-botanical inline-flex min-h-11 min-w-11 items-center justify-center"
+                      aria-label={link.platform}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <SocialIcon platform={link.platform} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <p className="text-caption text-botanical/80">{t('footer.copyright')}</p>
           </div>
-        ))}
-        <div className="space-y-2">
-          <p className="text-body-sm font-semibold tracking-wide uppercase">{t('footer.legal')}</p>
-          <ul className="space-y-1">
-            {LEGAL.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} className="text-ivory/90 hover:text-ivory text-body-sm">
-                  {t(item.key)}
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
-        {footer.social.length > 0 ? (
-          <ul className="flex flex-wrap gap-3">
-            {footer.social.map((link) => (
-              <li key={link.id}>
-                <a href={link.url} className="text-ivory/90 hover:text-ivory text-body-sm">
-                  {link.platform}
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {!hasCms ? <p className="text-body-sm text-ivory/80">{t('empty.footer')}</p> : null}
-      </div>
-    </Footer>
+      </Footer>
+    </div>
   );
 }

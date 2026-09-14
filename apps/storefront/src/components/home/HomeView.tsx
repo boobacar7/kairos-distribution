@@ -5,6 +5,7 @@ import type { HomeContent } from '../../content/contract';
 import { t } from '../../messages/t';
 import { CategoriesSection } from './CategoriesSection';
 import { FaqSection } from './FaqSection';
+import { FeaturedRow } from './FeaturedRow';
 import { HeroSection } from './HeroSection';
 import { ProductGrid } from './ProductGrid';
 import { PromoSection } from './PromoSection';
@@ -29,13 +30,7 @@ export function HomeView({ content }: { content: HomeContent }) {
     HERO: () => <HeroSection slides={content.hero} />,
     TRUST_BAR: () => <TrustBar items={content.trustBar} />,
     CATEGORIES: () => <CategoriesSection categories={content.categories} />,
-    PRODUITS_PHARES: () => (
-      <ProductGrid
-        id="produits-phares"
-        title={SECTION_TITLE.PRODUITS_PHARES}
-        products={content.featuredProducts}
-      />
-    ),
+    PRODUITS_PHARES: () => <FeaturedRow products={content.featuredProducts} />,
     INCONTOURNABLES: () => (
       <ProductGrid
         id="incontournables"
@@ -43,7 +38,9 @@ export function HomeView({ content }: { content: HomeContent }) {
         products={content.bestsellers}
       />
     ),
-    AVIS_VERIFIES: () => <ReviewsSection reviews={content.reviews} />,
+    AVIS_VERIFIES: () => (
+      <ReviewsSection reviews={content.reviews} summary={content.reviewsSummary} />
+    ),
     PROMO_BANNER: () => <PromoSection banners={content.banners} />,
     TESTIMONIALS: () => <TestimonialsSection testimonials={content.testimonials} />,
     FAQ: () => <FaqSection items={content.faq} />,

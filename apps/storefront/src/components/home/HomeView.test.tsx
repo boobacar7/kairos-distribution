@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { publishedHome } from '../../content/published-content';
 import { buildStubHome } from '../../content/stub';
+import { buildVisualHome } from '../../content/visual-home';
 import { t } from '../../messages/t';
 import { HomeView } from './HomeView';
 
@@ -33,6 +34,18 @@ describe('HomeView', () => {
     expect(screen.getByText('[TEST] Produit 1')).toBeInTheDocument();
     expect(screen.getByText(t('empty.reviews'))).toBeInTheDocument();
     expect(screen.queryByRole('img', { name: /miracle/i })).not.toBeInTheDocument();
+  });
+
+  it('renders the approved visual homepage without review quotes', () => {
+    const content = publishedHome(buildVisualHome(), new Date());
+    render(<HomeView content={content} />);
+
+    expect(screen.getByRole('heading', { name: 'Une beauté plus naturelle, au quotidien' })).toBeInTheDocument();
+    expect(screen.getByText('Crème Éclat')).toBeInTheDocument();
+    expect(screen.getByText('KAIROS10')).toBeInTheDocument();
+    expect(screen.getByText('Soins')).toBeInTheDocument();
+    expect(screen.queryByText('Achat vérifié')).not.toBeInTheDocument();
+    expect(screen.queryByText(/lorem ipsum/i)).not.toBeInTheDocument();
   });
 
   it('has no axe violations on the empty homepage', async () => {
