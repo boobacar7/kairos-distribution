@@ -1,0 +1,9 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+# pnpm 10 does not run dependency lifecycle scripts unless they are allow-listed.
+# @prisma/client's postinstall runs `prisma generate`, which fails until DATABASE_AGENT
+# lands the schema in Phase 2. It is deliberately not allow-listed yet; the database
+# package runs `prisma generate` explicitly from its own `db:generate` script instead.
+onlyBuiltDependencies: []

@@ -1,0 +1,10 @@
+{
+  "//": "Solution file. Holds no sources; references every buildable package so `tsc --build` at the root builds the workspace in dependency order and reports a cyclic reference as a compiler error.",
+  "files": [],
+  "references": [
+    { "path": "packages/config" },
+    { "path": "packages/types" },
+    { "path": "packages/validation" },
+    { "path": "packages/database" }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "name": "kairos-distribution",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kairos Distributions e-commerce platform — monorepo root",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.33.3",
+  "engines": {
+    "node": ">=22.14.0 <23",
+    "pnpm": ">=10.33.3"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:boundaries": "tsx scripts/check-workspace-deps.ts",
+    "verify": "pnpm check:boundaries && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
+    "clean": "turbo run clean",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@kairos/config": "workspace:*",
+    "eslint": "10.10.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.12.0",
+    "prettier": "3.9.6",
+    "tsx": "4.23.13",
+    "turbo": "2.10.12",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.0"
+  }
+}
