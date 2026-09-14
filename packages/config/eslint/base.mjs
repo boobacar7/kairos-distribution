@@ -35,6 +35,8 @@ export const baseConfig = tseslint.config(
       '**/coverage/**',
       '**/node_modules/**',
       '**/*.tsbuildinfo',
+      '**/src/generated/**',
+      '**/generated/**',
     ],
   },
 

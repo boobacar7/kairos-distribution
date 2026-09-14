@@ -1,0 +1,189 @@
+model Category {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  description    String?
+  imageAssetId   String?
+  isActive       Boolean   @default(true)
+  position       Int       @default(0)
+  parentId       String?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt      DateTime? @db.Timestamptz(6)
+
+  parent   Category?   @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Category[]  @relation("CategoryTree")
+  image    MediaAsset? @relation(fields: [imageAssetId], references: [id], onDelete: SetNull)
+  products Product[]
+
+  @@index([isActive, position])
+  @@index([parentId])
+  @@index([imageAssetId])
+  @@map("categories")
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  name             String
+  slug             String        @unique
+  description      String?
+  shortDescription String?
+  categoryId       String
+  status           ProductStatus @default(DRAFT)
+  taxCategoryId    String?
+  isFeatured       Boolean       @default(false)
+  isBestseller     Boolean       @default(false)
+  isOnPromotion    Boolean       @default(false)
+  ingredients      String?
+  benefits         String?
+  usage            String?
+  precautions      String?
+  seoTitle         String?
+  seoDescription   String?
+  canonicalUrl     String?
+  minPrice         Int?
+  maxPrice         Int?
+  ratingAverage    Decimal?      @db.Decimal(3, 2)
+  ratingCount      Int           @default(0)
+  /// Written ONLY by the catalog.recompute_availability outbox worker. Never inside reservation.
+  totalAvailableQty Int          @default(0)
+  publishedAt      DateTime?     @db.Timestamptz(6)
+  archivedAt       DateTime?     @db.Timestamptz(6)
+  createdAt        DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime      @updatedAt @db.Timestamptz(6)
+  deletedAt        DateTime?     @db.Timestamptz(6)
+
+  category     Category              @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  taxCategory  TaxCategory?          @relation(fields: [taxCategoryId], references: [id], onDelete: Restrict)
+  variants     ProductVariant[]
+  images       ProductImage[]
+  options      ProductOption[]
+  tags         ProductTag[]
+  collections  CollectionProduct[]
+  reviews      Review[]
+  wishlistedBy WishlistItem[]
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+  discounts    DiscountProduct[]
+  dailyMetrics ProductDailyMetric[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+  @@index([isFeatured, status])
+  @@index([isBestseller, status])
+  @@index([isOnPromotion, status])
+  @@index([minPrice])
+  @@index([deletedAt])
+  @@index([taxCategoryId])
+  @@map("products")
+}
+
+model ProductImage {
+  id           String  @id @default(cuid())
+  productId    String
+  mediaAssetId String
+  variantId    String?
+  position     Int     @default(0)
+  isPrimary    Boolean @default(false)
+  altOverride  String?
+
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset      @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+  variant    ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@unique([productId, mediaAssetId])
+  @@index([productId, position])
+  @@index([mediaAssetId])
+  @@index([variantId])
+  @@map("product_images")
+}
+
+model ProductOption {
+  id        String @id @default(cuid())
+  productId String
+  name      String
+  position  Int    @default(0)
+
+  product Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  values  ProductOptionValue[]
+
+  @@unique([productId, name])
+  @@map("product_options")
+}
+
+model ProductOptionValue {
+  id       String @id @default(cuid())
+  optionId String
+  value    String
+  position Int    @default(0)
+
+  option   ProductOption               @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  variants ProductVariantOptionValue[]
+
+  @@unique([optionId, value])
+  @@map("product_option_values")
+}
+
+/// Variant seam. Every product has >= 1 variant; exactly one isDefault (partial unique index).
+model ProductVariant {
+  id             String    @id @default(cuid())
+  productId      String
+  name           String    @default("Default")
+  sku            String    @unique
+  barcode        String?   @unique
+  price          Int
+  compareAtPrice Int?
+  cost           Int?
+  weightGrams    Int?
+  position       Int       @default(0)
+  isDefault      Boolean   @default(false)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt      DateTime? @db.Timestamptz(6)
+
+  product       Product                     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionValues  ProductVariantOptionValue[]
+  inventoryItem InventoryItem?
+  images        ProductImage[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+
+  @@index([productId, position])
+  @@index([deletedAt])
+  @@map("product_variants")
+}
+
+model ProductVariantOptionValue {
+  variantId     String
+  optionValueId String
+
+  variant     ProductVariant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  optionValue ProductOptionValue @relation(fields: [optionValueId], references: [id], onDelete: Restrict)
+
+  @@id([variantId, optionValueId])
+  @@index([optionValueId])
+  @@map("product_variant_option_values")
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  slug     String       @unique
+  products ProductTag[]
+
+  @@map("tags")
+}
+
+model ProductTag {
+  productId String
+  tagId     String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@index([tagId])
+  @@map("product_tags")
+}

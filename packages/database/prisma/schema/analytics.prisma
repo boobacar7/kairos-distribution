@@ -1,0 +1,67 @@
+/// No foreign keys by design: analytics must survive anonymisation, and FK checks on the
+/// hottest insert path buy no integrity for data that is only ever aggregated.
+model AnalyticsEvent {
+  id           BigInt             @id @default(autoincrement())
+  type         AnalyticsEventType
+  sessionId    String
+  anonymousId  String?
+  customerId   String?
+  productId    String?
+  variantId    String?
+  categoryId   String?
+  collectionId String?
+  orderId      String?
+  path         String?
+  referrer     String?
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  deviceType   String?
+  value        Int?
+  metadata     Json?
+  occurredAt   DateTime           @default(now()) @db.Timestamptz(6)
+
+  @@index([type, occurredAt])
+  @@index([productId, type, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@index([occurredAt])
+  @@map("analytics_events")
+}
+
+model DailySalesMetric {
+  date               DateTime @id @db.Date
+  ordersCount        Int      @default(0)
+  grossRevenue       BigInt   @default(0)
+  discountTotal      BigInt   @default(0)
+  deliveryRevenue    BigInt   @default(0)
+  refundTotal        BigInt   @default(0)
+  netRevenue         BigInt   @default(0)
+  averageOrderValue  Int      @default(0)
+  newCustomers       Int      @default(0)
+  returningCustomers Int      @default(0)
+  sessions           Int      @default(0)
+  checkoutsStarted   Int      @default(0)
+  conversionRateBp   Int      @default(0)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("daily_sales_metrics")
+}
+
+model ProductDailyMetric {
+  id               String   @id @default(cuid())
+  date             DateTime @db.Date
+  productId        String
+  views            Int      @default(0)
+  addToCarts       Int      @default(0)
+  unitsSold        Int      @default(0)
+  revenue          BigInt   @default(0)
+  conversionRateBp Int      @default(0)
+  updatedAt        DateTime @updatedAt @db.Timestamptz(6)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([date, productId])
+  @@index([date, unitsSold])
+  @@index([productId, date])
+  @@map("product_daily_metrics")
+}

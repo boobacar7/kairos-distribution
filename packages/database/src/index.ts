@@ -1,33 +1,42 @@
-/**
- * @kairos/database — wired but intentionally empty.
- *
- * This package is owned by DATABASE_AGENT (docs/agent-task-map.md). ARCHITECT_AGENT created the
- * shell — dependencies, build wiring, scripts and boundary registration — but must not author the
- * schema. Phase 2 fills it in.
- *
- * Two boundary rules apply here and are enforced, not merely documented:
- *
- *   1. Only `apps/api` may depend on this package. Letting a Next.js application import Prisma
- *      would pull the query engine into the client dependency graph, expose the full model
- *      surface, and make DATABASE_URL a storefront secret. See docs/architecture.md §3.2 rule 3,
- *      scripts/check-workspace-deps.ts, and the `no-restricted-imports` rule in the shared ESLint
- *      config.
- *
- *   2. `schema.prisma` has a single writer. Every other agent requests a migration rather than
- *      editing it, because four agents editing one schema produces conflicting migration
- *      timestamps and a broken shadow database.
- *
- * What Phase 2 adds here:
- *   - prisma/schema/*.prisma  (schema folder, one file per bounded context)
- *   - prisma/migrations/
- *   - prisma/seed/            (reference and configuration data only — no products, orders,
- *                             reviews or customers; spec §41)
- *   - src/client.ts           (the PrismaClient singleton)
- *   - src/index.ts            (re-exports the client and generated types)
- *
- * `prisma generate` is deliberately not wired into install or CI yet: there is no schema, so it
- * would fail. The `db:generate` script exists and is run explicitly once the schema lands.
- */
+export { installJsonSerializers } from './serialize.js';
+export {
+  createPrismaClient,
+  getPrismaClient,
+  disconnectPrismaClient,
+  Prisma,
+  PrismaClient,
+  type CreatePrismaClientOptions,
+  type KairosPrismaClient,
+} from './client.js';
+export {
+  INVENTORY_LEDGER_GUC,
+  OutOfStockError,
+  InventoryInconsistencyError,
+  assertReadCommitted,
+  enableInventoryLedger,
+  withInventoryTransaction,
+  reserveTrackedStock,
+  type ReserveStockInput,
+} from './inventory.js';
+export {
+  ORDER_REFERENCE_SCOPE,
+  INVOICE_REFERENCE_SCOPE,
+  DEFAULT_ORDER_PREFIX,
+  ORDER_COUNTER_MAX,
+  OrderReferenceOverflowError,
+  formatOrderReference,
+  allocateSequenceValue,
+  allocateOrderReference,
+} from './order-reference.js';
+export {
+  GUEST_CLAIM_TOKEN_BYTES,
+  DEFAULT_GUEST_CLAIM_TTL_DAYS,
+  GuestClaimError,
+  generateGuestClaimToken,
+  hashGuestClaimToken,
+  claimGuestOrder,
+  assertTokenNotDerivedFromReference,
+} from './guest-claim.js';
 
-/** Placeholder so the package has a valid build output before the schema exists. */
-export const DATABASE_PACKAGE_READY = false;
+/** Placeholder from the Phase 1 shell, kept so existing imports do not break. */
+export const DATABASE_PACKAGE_READY = true;

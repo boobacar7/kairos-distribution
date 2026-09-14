@@ -27,6 +27,10 @@
       "types": "./dist/tax/index.d.ts",
       "default": "./dist/tax/index.js"
     },
+    "./order-status": {
+      "types": "./dist/order-status/index.d.ts",
+      "default": "./dist/order-status/index.js"
+    },
     "./registry": {
       "types": "./dist/registry/index.d.ts",
       "default": "./dist/registry/index.js"

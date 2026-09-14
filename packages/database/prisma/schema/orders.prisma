@@ -1,0 +1,251 @@
+model Order {
+  id        String @id @default(cuid())
+  reference String @unique
+
+  customerId String?
+  cartId     String? @unique
+
+  email     String
+  phone     String
+  firstName String
+  lastName  String
+
+  status        OrderStatus        @default(PENDING)
+  paymentStatus OrderPaymentStatus @default(UNPAID)
+  currency      String             @default("XOF")
+
+  subtotal      Int
+  discountTotal Int @default(0)
+  deliveryTotal Int @default(0)
+  taxTotal      Int @default(0)
+  grandTotal    Int
+  refundedTotal Int @default(0)
+
+  /// Architecture names this taxTreatment. Stored as taxMode per the data model.
+  taxMode               TaxMode @default(INCLUSIVE)
+  deliveryTaxAmount     Int     @default(0)
+  deliveryTaxRateBp     Int     @default(0)
+  taxZoneId             String?
+  taxZoneNameSnapshot   String?
+
+  deliveryZoneId       String?
+  deliveryMethodId     String?
+  deliveryZoneName     String
+  deliveryMethodName   String
+  deliveryFeeSnapshot  Int
+  deliveryEtaMinHours  Int?
+  deliveryEtaMaxHours  Int?
+  deliveryInstructions String?
+  trackingNumber       String?
+  trackingUrl          String?
+
+  customerNote String?
+  internalNote String?
+  cancelReason String?
+
+  /// SHA-256 of the CSPRNG claim secret. Plaintext is never persisted.
+  guestClaimTokenHash      String?   @unique
+  guestClaimTokenExpiresAt DateTime? @db.Timestamptz(6)
+  claimedAt                DateTime? @db.Timestamptz(6)
+
+  placedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  confirmedAt DateTime? @db.Timestamptz(6)
+  paidAt      DateTime? @db.Timestamptz(6)
+  shippedAt   DateTime? @db.Timestamptz(6)
+  deliveredAt DateTime? @db.Timestamptz(6)
+  cancelledAt DateTime? @db.Timestamptz(6)
+  refundedAt  DateTime? @db.Timestamptz(6)
+
+  ipAddress String?
+  userAgent String?
+  version   Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  cart           Cart?           @relation(fields: [cartId], references: [id], onDelete: SetNull)
+  deliveryZone   DeliveryZone?   @relation(fields: [deliveryZoneId], references: [id], onDelete: Restrict)
+  deliveryMethod DeliveryMethod? @relation(fields: [deliveryMethodId], references: [id], onDelete: Restrict)
+  taxZone        TaxZone?        @relation(fields: [taxZoneId], references: [id], onDelete: Restrict)
+
+  items          OrderItem[]
+  taxLines       OrderTaxLine[]
+  addresses      OrderAddress[]
+  statusHistory  OrderStatusHistory[]
+  discounts      OrderDiscount[]
+  redemptions    DiscountRedemption[]
+  payment        Payment?
+  refunds        Refund[]
+  invoice        Invoice?
+  reservations   StockReservation[]
+  stockMovements StockMovement[]
+  reviews        Review[]
+
+  @@unique([id, customerId])
+  @@index([customerId, placedAt])
+  @@index([status, placedAt])
+  @@index([paymentStatus, placedAt])
+  @@index([placedAt])
+  @@index([email])
+  @@index([phone])
+  @@index([grandTotal])
+  @@index([deliveryZoneId])
+  @@index([deliveryMethodId])
+  @@index([taxZoneId])
+  @@map("orders")
+}
+
+model OrderAddress {
+  id            String      @id @default(cuid())
+  orderId       String
+  kind          AddressKind
+  firstName     String
+  lastName      String
+  phone         String
+  line1         String
+  line2         String?
+  city          String
+  neighbourhood String?
+  region        String?
+  postalCode    String?
+  countryCode   String      @default("BF")
+  instructions  String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, kind])
+  @@map("order_addresses")
+}
+
+model OrderItem {
+  id                String @id @default(cuid())
+  orderId           String
+  productId         String
+  variantId         String
+  sku               String
+  productName       String
+  variantName       String
+  productSlug       String
+  imageUrl          String?
+  unitPrice         Int
+  compareAtPrice    Int?
+  unitCost          Int?
+  quantity          Int
+  lineSubtotal      Int
+  discountAllocated Int    @default(0)
+  lineTotal         Int
+  taxAmount         Int    @default(0)
+  taxRateBp         Int    @default(0)
+  taxCategoryCode   String?
+  taxRateName       String?
+  productSnapshot   Json
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  order       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant     ProductVariant    @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  reservation StockReservation?
+  review      Review?
+
+  @@unique([id, orderId])
+  @@unique([id, productId])
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id               String       @id @default(cuid())
+  orderId          String
+  sequence         Int
+  fromStatus       OrderStatus?
+  toStatus         OrderStatus
+  actorType        ActorType    @default(SYSTEM)
+  actorAdminUserId String?
+  note             String?
+  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
+
+  order Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor AdminUser? @relation(fields: [actorAdminUserId], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, sequence])
+  @@index([orderId, createdAt])
+  @@index([actorAdminUserId])
+  @@map("order_status_history")
+}
+
+model OrderTaxLine {
+  id            String  @id @default(cuid())
+  orderId       String
+  taxRateId     String?
+  name          String
+  rateBp        Int
+  taxableAmount Int
+  taxAmount     Int
+  isInclusive   Boolean
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  taxRate TaxRate? @relation(fields: [taxRateId], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, rateBp, isInclusive])
+  @@index([orderId])
+  @@index([taxRateId])
+  @@map("order_tax_lines")
+}
+
+/// Sole source of truth for the spec §12 state machine. A hardcoded switch is a rejection.
+model OrderStatusTransitionRule {
+  fromStatus          OrderStatus
+  toStatus            OrderStatus
+  requiresPayment     Boolean     @default(false)
+  requiredPermission  String?
+  releasesReservation Boolean     @default(false)
+  restocksInventory   Boolean     @default(false)
+
+  @@id([fromStatus, toStatus])
+  @@map("order_status_transition_rules")
+}
+
+model OrderDiscount {
+  id            String       @id @default(cuid())
+  orderId       String
+  discountId    String?
+  code          String
+  title         String
+  type          DiscountType
+  value         Decimal      @db.Decimal(12, 2)
+  amountApplied Int
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  discount Discount? @relation(fields: [discountId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([discountId])
+  @@map("order_discounts")
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  number      String   @unique
+  issuedAt    DateTime @default(now()) @db.Timestamptz(6)
+  totalAmount Int
+  documentUrl String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@map("invoices")
+}
+
+model NumberSequence {
+  scope     String
+  year      Int
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@id([scope, year])
+  @@map("number_sequences")
+}

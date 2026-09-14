@@ -91,6 +91,71 @@ export const INVENTORY_SETTING_DEFAULTS = {
   [INVENTORY_SETTING_KEYS.DEFAULT_LOW_STOCK_THRESHOLD]: 5,
 } as const;
 
+export const CART_SETTING_KEYS = {
+  TTL_DAYS: 'cart.ttlDays',
+} as const;
+
+export const CART_SETTING_DEFAULTS = {
+  [CART_SETTING_KEYS.TTL_DAYS]: 30,
+} as const;
+
+export const ORDER_SETTING_KEYS = {
+  REFERENCE_PREFIX: 'orders.referencePrefix',
+  GUEST_CLAIM_TOKEN_TTL_DAYS: 'orders.guestClaimTokenTtlDays',
+} as const;
+
+export const ORDER_SETTING_DEFAULTS = {
+  [ORDER_SETTING_KEYS.REFERENCE_PREFIX]: 'KD',
+  /** Confirmed 2026-09-14: claim tokens expire after 30 days. */
+  [ORDER_SETTING_KEYS.GUEST_CLAIM_TOKEN_TTL_DAYS]: 30,
+} as const;
+
+export const TAX_SETTING_KEYS = {
+  DEFAULT_ZONE_KEY: 'tax.defaultZoneKey',
+  DEFAULT_MODE: 'tax.defaultMode',
+} as const;
+
+export const TAX_SETTING_DEFAULTS = {
+  [TAX_SETTING_KEYS.DEFAULT_ZONE_KEY]: 'BF',
+  [TAX_SETTING_KEYS.DEFAULT_MODE]: 'INCLUSIVE',
+} as const;
+
+/** Spec §5 homepage sections, seeded in this order. */
+export const HOMEPAGE_SECTION_KEYS = [
+  'HERO',
+  'TRUST_BAR',
+  'CATEGORIES',
+  'PRODUITS_PHARES',
+  'INCONTOURNABLES',
+  'AVIS_VERIFIES',
+  'PROMO_BANNER',
+  'TESTIMONIALS',
+  'FAQ',
+] as const;
+export type HomepageSectionKey = (typeof HOMEPAGE_SECTION_KEYS)[number];
+
+/** Spec §4 / §25 static page slugs. Seeded DRAFT with empty body — copy is Bob's. */
+export const STATIC_PAGE_SLUGS = [
+  'faq',
+  'livraison',
+  'retours',
+  'confidentialite',
+  'conditions',
+  'contact',
+] as const;
+export type StaticPageSlug = (typeof STATIC_PAGE_SLUGS)[number];
+
+/** Spec §7 category slugs. Names are seeded verbatim; descriptions stay empty. */
+export const CATEGORY_SEEDS = [
+  { slug: 'beaute-soins', name: 'Beauté & soins' },
+  { slug: 'silhouette-bien-etre', name: 'Silhouette & bien-être' },
+  { slug: 'boost-fessier', name: 'Boost fessier' },
+  { slug: 'thes-infusions', name: 'Thés & infusions' },
+  { slug: 'capsules', name: 'Capsules' },
+  { slug: 'packs', name: 'Packs' },
+  { slug: 'promotions', name: 'Promotions' },
+] as const;
+
 /**
  * Reserved name prefix for demo catalogue data (confirmed §8).
  *

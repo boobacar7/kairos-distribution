@@ -1,0 +1,34 @@
+model CustomerSegment {
+  id             String      @id @default(cuid())
+  key            String      @unique
+  name           String
+  description    String?
+  type           SegmentType @default(RULE_BASED)
+  rules          Json?
+  isSystem       Boolean     @default(false)
+  colorToken     String?
+  customerCount  Int         @default(0)
+  lastComputedAt DateTime?   @db.Timestamptz(6)
+  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime    @updatedAt @db.Timestamptz(6)
+
+  memberships CustomerSegmentMembership[]
+  discounts   DiscountSegment[]
+  campaigns   Campaign[]
+
+  @@map("customer_segments")
+}
+
+model CustomerSegmentMembership {
+  segmentId  String
+  customerId String
+  source     SegmentMembershipSource @default(RULE)
+  addedAt    DateTime                @default(now()) @db.Timestamptz(6)
+
+  segment  CustomerSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  customer Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@id([segmentId, customerId])
+  @@index([customerId])
+  @@map("customer_segment_memberships")
+}

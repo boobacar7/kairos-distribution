@@ -1,0 +1,60 @@
+model TaxCategory {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  isDefault   Boolean  @default(false)
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  products Product[]
+  rates    TaxRate[]
+
+  @@map("tax_categories")
+}
+
+model TaxZone {
+  id                 String   @id @default(cuid())
+  key                String   @unique
+  name               String
+  countryCode        String
+  region             String?
+  registrationNumber String?
+  isActive           Boolean  @default(true)
+  priority           Int      @default(0)
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+
+  rates  TaxRate[]
+  orders Order[]
+
+  @@unique([countryCode, region])
+  @@index([isActive, priority])
+  @@map("tax_zones")
+}
+
+/// A new rate is a new row, never an UPDATE of a historical one.
+/// Launch seed is rateBp = 0. Do not encode a Burkina Faso VAT rate.
+model TaxRate {
+  id                String   @id @default(cuid())
+  taxZoneId         String
+  taxCategoryId     String
+  name              String
+  rateBp            Int
+  mode              TaxMode  @default(INCLUSIVE)
+  appliesToDelivery Boolean  @default(false)
+  effectiveFrom     DateTime @db.Timestamptz(6)
+  effectiveTo       DateTime? @db.Timestamptz(6)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+
+  zone          TaxZone        @relation(fields: [taxZoneId], references: [id], onDelete: Restrict)
+  category      TaxCategory    @relation(fields: [taxCategoryId], references: [id], onDelete: Restrict)
+  orderTaxLines OrderTaxLine[]
+
+  @@index([taxZoneId, taxCategoryId, effectiveFrom])
+  @@index([isActive, effectiveFrom, effectiveTo])
+  @@map("tax_rates")
+}
