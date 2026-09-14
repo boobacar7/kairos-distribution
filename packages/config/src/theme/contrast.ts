@@ -249,6 +249,32 @@ export const APPROVED_PAIRS: readonly ContrastPair[] = [
     role: 'decorative',
     notes: 'Insufficient contrast. Do not put ivory text on soft green.',
   },
+  {
+    foreground: 'gold',
+    background: 'ivory',
+    role: 'decorative',
+    notes:
+      'Star glyphs on the homepage (~2.7:1). Fails AA as text. Gold is not a copy colour on ivory.',
+  },
+  {
+    foreground: 'ivory',
+    background: 'whatsapp',
+    role: 'decorative',
+    notes:
+      'WhatsApp FAB glyph. Official white-on-green brand fill fails 3:1; the control name is the accessible name.',
+  },
+  {
+    foreground: 'ink',
+    background: 'whatsapp',
+    role: 'text',
+    notes: 'Accessible text on the WhatsApp brand fill if copy is ever placed there.',
+  },
+  {
+    foreground: 'ink',
+    background: 'whatsapp',
+    role: 'ui',
+    notes: 'Focus/control contrast on the WhatsApp brand fill.',
+  },
 ];
 
 export function isApprovedPair(

@@ -1,10 +1,11 @@
 /**
- * Kairos brand palette — the only hex colours in the system.
+ * Canonical hex colours for the system. Spec §3 brand colours plus Bob-approved homepage
+ * tokens (gold stars, WhatsApp third-party brand). Do not add a hex anywhere else.
  *
- * Spec §3. Warm beige and powder pink fail WCAG AA as body text on ivory; they are
- * surfaces and decorative accents, never text-on-ivory. See `contrast.ts`.
- *
- * Do not add a hex here that is not in the spec. Do not add a hex anywhere else.
+ * Warm beige and powder pink fail WCAG AA as body text on ivory; they are surfaces and
+ * decorative accents, never text-on-ivory. Gold is a star glyph on ivory (decorative).
+ * WhatsApp green is Meta’s functional brand fill for the FAB, not a Kairos colour.
+ * See `contrast.ts`.
  */
 
 export const PALETTE = {
@@ -16,6 +17,10 @@ export const PALETTE = {
   coral: '#E86F5B',
   aubergine: '#3C2635',
   ink: '#18211D',
+  /** Star fill sampled from the approved homepage frames (Bob, 2026-09-14). */
+  gold: '#C88B43',
+  /** WhatsApp brand green — third-party functional, not Kairos. */
+  whatsapp: '#25D366',
 } as const;
 
 export type PaletteName = keyof typeof PALETTE;
@@ -31,6 +36,8 @@ export const PALETTE_CSS_NAMES: Record<PaletteName, string> = {
   coral: 'coral',
   aubergine: 'aubergine',
   ink: 'ink',
+  gold: 'gold',
+  whatsapp: 'whatsapp',
 };
 
 export const PALETTE_HEXES: readonly PaletteHex[] = Object.values(PALETTE);

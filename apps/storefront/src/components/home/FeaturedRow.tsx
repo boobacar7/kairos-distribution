@@ -29,7 +29,7 @@ function StarRow({
         <span
           key={index}
           aria-hidden="true"
-          className={index < rounded ? `${type} text-coral` : `${type} text-beige`}
+          className={index < rounded ? `${type} text-gold` : `${type} text-beige`}
         >
           ★
         </span>
@@ -46,7 +46,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
       <section
         id="produits-phares"
         aria-labelledby="produits-phares-titre"
-        className="px-gutter py-4 md:px-gutter-lg"
+        className="px-gutter py-2 md:px-gutter-lg"
       >
         <div className="mx-auto max-w-7xl space-y-4">
           <h2 id="produits-phares-titre" className="font-serif text-h3 text-botanical md:text-h2">
@@ -62,10 +62,10 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
     <section
       id="produits-phares"
       aria-labelledby="produits-phares-titre"
-      className="px-gutter py-4 md:px-gutter-lg"
+      className="px-gutter py-2 md:px-gutter-lg"
     >
       <div className="mx-auto max-w-7xl">
-        <div className="mb-4 flex items-baseline justify-between gap-4">
+        <div className="mb-2 flex items-baseline justify-between gap-4 md:mb-3">
           <h2 id="produits-phares-titre" className="font-serif text-h3 text-botanical md:text-h2">
             {t('home.featured')}
           </h2>
@@ -81,7 +81,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                 : undefined;
             return (
               <li key={product.id}>
-                <article className="relative flex flex-col gap-1.5 md:flex-row md:items-center md:gap-3 md:pr-10">
+                <article className="relative flex flex-col gap-1 md:flex-row md:items-center md:gap-3 md:pr-10">
                   <a href={`/produit/${product.slug}`} className="shrink-0">
                     {product.image ? (
                       <img
@@ -89,21 +89,21 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         alt={product.image.alt}
                         width={product.image.width ?? 160}
                         height={product.image.height ?? 160}
-                        className="h-[4.5rem] w-full rounded-lg object-cover md:h-[7.5rem] md:w-[7.5rem]"
+                        className="h-[4.5rem] w-full rounded-lg object-cover md:h-[6.75rem] md:w-[6.75rem]"
                         loading="lazy"
                       />
                     ) : (
-                      <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[7.5rem] md:w-[7.5rem]" />
+                      <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[6.75rem] md:w-[6.75rem]" />
                     )}
                   </a>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
-                        <h3 className="text-botanical text-caption leading-tight font-semibold md:text-body-sm">
+                        <h3 className="text-botanical line-clamp-2 text-caption leading-tight font-semibold md:text-body-sm">
                           {product.name}
                         </h3>
                         {product.subtitle ? (
-                          <p className="text-botanical/70 text-caption leading-tight">
+                          <p className="text-botanical/70 truncate text-caption leading-tight">
                             {product.subtitle}
                           </p>
                         ) : null}
@@ -113,7 +113,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       ) : null}
                     </div>
                     {rating !== undefined ? (
-                      <p className="mt-0.5 flex flex-wrap items-center gap-x-1">
+                      <p className="mt-0.5 flex flex-nowrap items-center gap-x-1 whitespace-nowrap">
                         <StarRow value={rating} label={t('reviews.rating', { value: rating })} />
                         <span className="text-botanical/70 text-caption">
                           {t('product.stars', { count: product.reviewCount ?? 0 })}

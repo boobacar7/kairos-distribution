@@ -18,10 +18,10 @@ export function StorefrontFooter({ footer }: { footer: FooterContent }) {
   return (
     <div className="storefront-footer-light">
       <Footer label={t('footer.label')}>
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <BrandMark compact />
           {links.length > 0 ? (
-            <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 md:flex-nowrap">
               {links.map((link) => (
                 <li key={link.id}>
                   <a
@@ -45,7 +45,7 @@ export function StorefrontFooter({ footer }: { footer: FooterContent }) {
                   <li key={link.id}>
                     <a
                       href={link.url}
-                      className="text-botanical inline-flex min-h-11 min-w-11 items-center justify-center"
+                      className="text-botanical inline-flex min-h-8 min-w-8 items-center justify-center"
                       aria-label={link.platform}
                       target="_blank"
                       rel="noreferrer"

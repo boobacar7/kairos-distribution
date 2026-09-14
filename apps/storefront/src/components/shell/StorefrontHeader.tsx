@@ -22,12 +22,18 @@ function navIsCurrent(key: (typeof DESKTOP_NAV)[number]['key'], pathname: string
   return false;
 }
 
-export function StorefrontHeader() {
+export function StorefrontHeader({
+  cartCount = 0,
+  demoCart = false,
+}: {
+  cartCount?: number;
+  demoCart?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
     <header className="bg-ivory/95 border-beige sticky top-0 z-40 border-b backdrop-blur">
-      <div className="relative mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-gutter py-2 md:min-h-20 md:px-gutter-lg">
+      <div className="relative mx-auto flex min-h-14 max-w-7xl items-center justify-between gap-3 px-gutter py-1.5 md:min-h-[4.5rem] md:px-gutter-lg md:py-2">
         <BrandMark />
         <nav
           aria-label={t('nav.primary')}
@@ -75,7 +81,7 @@ export function StorefrontHeader() {
           >
             <AccountGlyph />
           </a>
-          <CartIcon />
+          <CartIcon count={cartCount} demo={demoCart} />
         </div>
       </div>
     </header>

@@ -1,3 +1,4 @@
+import { parseStorefrontEnv } from '@kairos/config';
 import { SkipLink } from '@kairos/ui';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -8,6 +9,7 @@ import { StorefrontHeader } from '../components/shell/StorefrontHeader';
 import { WhatsAppFab } from '../components/shell/WhatsAppFab';
 import type { FooterContent } from '../content/contract';
 import { loadHomeContent } from '../content/load-home';
+import { VISUAL_DEMO_CART_COUNT } from '../content/visual-home';
 import { t } from '../messages/t';
 import './globals.css';
 
@@ -26,6 +28,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   } catch {
     // Layout still renders when the CMS payload is unavailable; the page error boundary handles it.
   }
+
+  const env = parseStorefrontEnv(process.env);
+  const demoCart = !env.KAIROS_API_URL;
+  const cartCount = demoCart ? VISUAL_DEMO_CART_COUNT : 0;
 
   return (
     <html lang="fr-BF">
@@ -47,13 +53,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body className="bg-ivory text-ink font-sans">
         <SkipLink href="#contenu">{t('a11y.skip')}</SkipLink>
-        <StorefrontHeader />
-        <main id="contenu" className="pb-20 md:pb-0">
+        <StorefrontHeader cartCount={cartCount} demoCart={demoCart} />
+        <main id="contenu" className="pb-16 md:pb-0">
           {children}
         </main>
         <StorefrontFooter footer={footer} />
         <WhatsAppFab />
-        <MobileBottomNav />
+        <MobileBottomNav cartCount={cartCount} demoCart={demoCart} />
       </body>
     </html>
   );

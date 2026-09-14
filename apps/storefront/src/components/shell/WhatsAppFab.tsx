@@ -5,7 +5,7 @@ export function WhatsAppFab() {
   return (
     <a
       href="/contact"
-      className="bg-botanical text-ivory hover:bg-botanical/90 fixed right-3 bottom-32 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full shadow-raised md:right-4 md:bottom-8"
+      className="bg-whatsapp text-ivory hover:bg-whatsapp/90 fixed right-3 bottom-[4.5rem] z-50 inline-flex h-11 w-11 items-center justify-center rounded-full shadow-raised md:right-4 md:bottom-6 md:h-12 md:w-12"
       aria-label={t('nav.whatsapp')}
     >
       <WhatsAppGlyph />

@@ -9,7 +9,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
           Ka
           <span className="relative inline-block">
             i
-            <LeafGlyph className="absolute -top-1 left-1/2 h-3.5 w-3.5 -translate-x-1/2" />
+            <LeafGlyph className="absolute -top-1.5 left-[42%] h-4 w-4 -translate-x-1/2 md:-top-2 md:h-5 md:w-5" />
           </span>
           ros
         </span>

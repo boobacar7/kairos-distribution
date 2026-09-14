@@ -33,6 +33,7 @@ export const messages = {
 
   'cart.icon': 'Panier',
   'cart.count': '{count} article(s) dans le panier',
+  'cart.demoCount': '[TEST] {count} articles dans le panier (démo visuelle)',
 
   'home.hero': 'À la une',
   'home.trust': 'Confiance',

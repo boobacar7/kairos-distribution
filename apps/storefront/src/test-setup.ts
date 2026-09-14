@@ -24,6 +24,25 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
+if (typeof PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    pointerId: number;
+    pointerType: string;
+    constructor(
+      type: string,
+      props: MouseEventInit & { pointerId?: number; pointerType?: string } = {},
+    ) {
+      super(type, props);
+      this.pointerId = props.pointerId ?? 1;
+      this.pointerType = props.pointerType ?? 'mouse';
+    }
+  }
+  Object.defineProperty(globalThis, 'PointerEvent', {
+    writable: true,
+    value: PointerEventPolyfill,
+  });
+}
+
 if (typeof HTMLCanvasElement !== 'undefined') {
   HTMLCanvasElement.prototype.getContext = function getContext() {
     return null;

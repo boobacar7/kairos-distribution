@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import { describe, expect, it } from 'vitest';
@@ -102,5 +102,63 @@ describe('Hero carousel wiring', () => {
     expect(screen.getByRole('heading', { name: '[TEST] Second' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: t('carousel.previous') }));
     expect(screen.getByRole('heading', { name: '[TEST] Premier' })).toBeInTheDocument();
+
+    const region = screen.getByRole('region', { name: t('carousel.label') });
+    region.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('heading', { name: '[TEST] Second' })).toBeInTheDocument();
+  });
+
+  it('advances the current slide on a horizontal pointer swipe', () => {
+    const raw = buildStubHome({ useTestCatalogue: false });
+    raw.hero = [
+      {
+        id: 'one',
+        title: '[TEST] Premier',
+        subtitle: null,
+        ctaLabel: null,
+        ctaUrl: null,
+        textPosition: 'LEFT',
+        desktopImage: null,
+        mobileImage: null,
+        isActive: true,
+        position: 0,
+        startsAt: null,
+        endsAt: null,
+      },
+      {
+        id: 'two',
+        title: '[TEST] Second',
+        subtitle: null,
+        ctaLabel: null,
+        ctaUrl: null,
+        textPosition: 'CENTER',
+        desktopImage: null,
+        mobileImage: null,
+        isActive: true,
+        position: 1,
+        startsAt: null,
+        endsAt: null,
+      },
+    ];
+    const content = publishedHome(raw, new Date(), { allowTestCatalogue: false });
+    render(<HomeView content={content} />);
+
+    const carousel = screen.getByTestId('hero-carousel');
+    fireEvent.touchStart(carousel, {
+      touches: [{ identifier: 1, clientX: 220, clientY: 40 }],
+      changedTouches: [{ identifier: 1, clientX: 220, clientY: 40 }],
+    });
+    fireEvent.touchMove(carousel, {
+      touches: [{ identifier: 1, clientX: 40, clientY: 40 }],
+      changedTouches: [{ identifier: 1, clientX: 40, clientY: 40 }],
+    });
+    fireEvent.touchEnd(carousel, {
+      touches: [],
+      changedTouches: [{ identifier: 1, clientX: 40, clientY: 40 }],
+    });
+
+    expect(screen.getByRole('heading', { name: '[TEST] Second' })).toBeInTheDocument();
+    expect(screen.getByTestId('hero-slide-1')).toHaveAttribute('data-current', 'true');
   });
 });

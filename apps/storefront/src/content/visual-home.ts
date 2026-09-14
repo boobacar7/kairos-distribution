@@ -10,6 +10,9 @@ import type { HomeContent, MediaRef } from './contract';
  * as soon as CMS/catalogue exist.
  */
 
+/** Reference-frame cart badge. Demo only; replaced by the real cart count later. */
+export const VISUAL_DEMO_CART_COUNT = 3;
+
 function media(id: string, url: string, alt: string, width: number, height: number): MediaRef {
   return { id, url, alt, width, height };
 }

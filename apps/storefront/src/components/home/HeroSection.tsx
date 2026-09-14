@@ -4,7 +4,7 @@ import { EmptyState } from '@kairos/ui';
 
 import type { HeroSlide } from '../../content/contract';
 import { t } from '../../messages/t';
-import { Carousel } from '../../ui/interactive';
+import { HeroCarousel } from './HeroCarousel';
 import { HeroPicture } from './HeroPicture';
 
 const TEXT_POSITION = {
@@ -27,9 +27,9 @@ export function HeroSection({ slides }: { slides: readonly HeroSlide[] }) {
   const photoLed = slides.some((slide) => slide.desktopImage);
 
   return (
-    <section aria-label={t('home.hero')} className="px-gutter pt-4 pb-2 md:px-gutter-lg md:pt-5">
+    <section aria-label={t('home.hero')} className="px-gutter pt-3 pb-1 md:px-gutter-lg md:pt-3">
       <div className={photoLed ? 'home-hero mx-auto max-w-7xl' : 'mx-auto max-w-7xl'}>
-        <Carousel
+        <HeroCarousel
           label={t('carousel.label')}
           previousLabel={t('carousel.previous')}
           nextLabel={t('carousel.next')}

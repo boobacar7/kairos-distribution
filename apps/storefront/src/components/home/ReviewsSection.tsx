@@ -22,17 +22,19 @@ export function ReviewsSection({
       count: summary.reviewCount,
     });
     return (
-      <section id="avis" aria-labelledby="avis-titre" className="px-gutter py-3 md:px-gutter-lg">
-        <div className="border-beige mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 rounded-xl border bg-ivory px-4 py-3 shadow-soft md:flex-nowrap md:gap-4 md:px-8">
+      <section id="avis" aria-labelledby="avis-titre" className="px-gutter py-2 md:px-gutter-lg">
+        <div className="border-beige mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 rounded-xl border bg-ivory px-3 py-2 shadow-soft md:flex md:items-center md:justify-between md:gap-4 md:px-8 md:py-3">
           <div className="min-w-0">
             <h2 id="avis-titre" className="text-botanical text-body font-semibold">
               {summary.headline}
             </h2>
             {summary.supporting ? (
-              <p className="text-botanical/80 max-w-xs text-caption">{summary.supporting}</p>
+              <p className="text-botanical/80 max-w-xs truncate text-caption">
+                {summary.supporting}
+              </p>
             ) : null}
           </div>
-          <div className="flex flex-col items-start gap-0.5 md:items-center">
+          <div className="flex flex-col items-end gap-0.5 md:order-none md:items-center">
             <StarRow
               value={summary.averageRating}
               label={t('reviews.rating', { value: summary.averageRating })}
@@ -40,7 +42,7 @@ export function ReviewsSection({
             />
             <p className="text-botanical text-caption">{averageLabel}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="col-span-2 flex items-center justify-end gap-2 md:col-span-1 md:gap-3">
             {summary.avatars.map((avatar) =>
               avatar.url ? (
                 <img
@@ -49,13 +51,13 @@ export function ReviewsSection({
                   alt={avatar.alt}
                   width={avatar.width ?? 150}
                   height={avatar.height ?? 72}
-                  className="h-10 w-auto rounded-full"
+                  className="h-8 w-auto rounded-full md:h-10"
                   loading="lazy"
                 />
               ) : null,
             )}
             {summary.additionalCount != null ? (
-              <span className="bg-beige text-botanical inline-flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-caption font-semibold">
+              <span className="bg-beige text-botanical inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-caption font-semibold md:h-10 md:min-w-10 md:px-3">
                 {t('reviews.more', { count: summary.additionalCount })}
               </span>
             ) : null}

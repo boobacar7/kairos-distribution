@@ -15,11 +15,11 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
   }
 
   return (
-    <section id="offres" aria-label={t('home.promo')} className="px-gutter py-4 md:px-gutter-lg">
+    <section id="offres" aria-label={t('home.promo')} className="px-gutter py-2 md:px-gutter-lg">
       <ul className="mx-auto grid max-w-7xl gap-4">
         {banners.map((banner) => (
           <li key={banner.id}>
-            <article className="bg-soft-green relative overflow-hidden rounded-xl px-4 py-5 md:px-8 md:py-6">
+            <article className="bg-soft-green relative overflow-hidden rounded-xl px-3 py-3 md:px-8 md:py-5">
               <img
                 src="/media/promo-leaf-left.jpg"
                 alt=""
@@ -32,8 +32,8 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                 className="pointer-events-none absolute right-0 bottom-0 h-full w-16 object-cover md:w-28"
                 aria-hidden="true"
               />
-              <div className="relative flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between md:gap-8 md:px-24">
-                <div className="text-center md:text-left">
+              <div className="relative grid grid-cols-[1fr_auto] items-center gap-2 md:flex md:flex-row md:items-center md:justify-between md:gap-8 md:px-24">
+                <div className="row-span-2 min-w-0 text-left">
                   {banner.eyebrow ? (
                     <p className="text-botanical text-caption font-semibold tracking-[0.18em] uppercase">
                       {banner.eyebrow}
@@ -50,7 +50,7 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                   ) : null}
                 </div>
                 {banner.code ? (
-                  <p className="border-beige bg-ivory text-botanical rounded-lg border px-4 py-3 text-center text-body-sm">
+                  <p className="border-beige bg-ivory text-botanical col-start-2 row-start-1 rounded-lg border px-3 py-2 text-center text-caption md:px-4 md:py-3 md:text-body-sm">
                     {t('home.promoCode')} :{' '}
                     <span className="font-semibold tracking-wide">{banner.code}</span>
                   </p>
@@ -58,7 +58,7 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                 {banner.ctaLabel && banner.ctaUrl ? (
                   <a
                     href={banner.ctaUrl}
-                    className="bg-botanical text-ivory inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-body-sm font-semibold"
+                    className="bg-botanical text-ivory col-start-2 row-start-2 inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-4 text-caption font-semibold md:min-h-11 md:px-5 md:text-body-sm"
                   >
                     {banner.ctaLabel}
                     <ArrowGlyph />

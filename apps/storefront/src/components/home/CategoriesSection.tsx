@@ -25,8 +25,8 @@ export function CategoriesSection({ categories }: { categories: readonly Categor
   }
 
   return (
-    <section aria-label={t('home.categories')} className="px-gutter py-4 md:px-gutter-lg md:py-6">
-      <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-2 md:gap-8">
+    <section aria-label={t('home.categories')} className="px-gutter py-2.5 md:px-gutter-lg md:py-4">
+      <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-1.5 md:gap-8">
         {categories.map((category) => {
           const visual = ICON_BY_SLUG[category.slug] ?? {
             Icon: LeafGlyph,
@@ -37,15 +37,15 @@ export function CategoriesSection({ categories }: { categories: readonly Categor
             <li key={category.id}>
               <a
                 href={`/boutique/${category.slug}`}
-                className="flex flex-col items-center gap-2 text-center md:flex-row md:gap-4 md:text-left"
+                className="flex flex-col items-center gap-1 text-center md:flex-row md:gap-4 md:text-left"
               >
                 <span
-                  className={`inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full md:h-20 md:w-20 ${visual.tone}`}
+                  className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full md:h-[4.5rem] md:w-[4.5rem] ${visual.tone}`}
                 >
-                  <Icon className="h-8 w-8" />
+                  <Icon className="h-6 w-6 md:h-8 md:w-8" />
                 </span>
                 <span>
-                  <span className="text-botanical block text-body-sm font-semibold md:text-body">
+                  <span className="text-botanical block text-caption font-semibold md:text-body">
                     {category.name}
                   </span>
                   {category.subtitle ? (

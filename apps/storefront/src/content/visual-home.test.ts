@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { publishedHome } from './published-content';
-import { buildVisualHome } from './visual-home';
+import { buildVisualHome, VISUAL_DEMO_CART_COUNT } from './visual-home';
 
 describe('buildVisualHome', () => {
   it('matches the approved homepage sections without review quotes', () => {
@@ -22,5 +22,6 @@ describe('buildVisualHome', () => {
     expect(published.featuredProducts.every((product) => !product.name.startsWith('[TEST]'))).toBe(
       true,
     );
+    expect(VISUAL_DEMO_CART_COUNT).toBe(3);
   });
 });
