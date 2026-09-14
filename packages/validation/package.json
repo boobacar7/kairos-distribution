@@ -1,0 +1,38 @@
+{
+  "name": "@kairos/validation",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Zod schemas and the DTO types inferred from them. The single source of truth for every API contract.",
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./common": {
+      "types": "./dist/common/index.d.ts",
+      "default": "./dist/common/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "clean": "tsc --build --clean"
+  },
+  "dependencies": {
+    "@kairos/types": "workspace:*",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@kairos/config": "workspace:*",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  }
+}

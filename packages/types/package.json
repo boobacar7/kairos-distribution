@@ -1,0 +1,54 @@
+{
+  "name": "@kairos/types",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared domain vocabulary. Leaf package: zero runtime dependencies, no zod, no React, no Prisma.",
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./money": {
+      "types": "./dist/money/index.d.ts",
+      "default": "./dist/money/index.js"
+    },
+    "./permissions": {
+      "types": "./dist/permissions/index.d.ts",
+      "default": "./dist/permissions/index.js"
+    },
+    "./enums": {
+      "types": "./dist/enums/index.d.ts",
+      "default": "./dist/enums/index.js"
+    },
+    "./tax": {
+      "types": "./dist/tax/index.d.ts",
+      "default": "./dist/tax/index.js"
+    },
+    "./order-status": {
+      "types": "./dist/order-status/index.d.ts",
+      "default": "./dist/order-status/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "default": "./dist/registry/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "clean": "tsc --build --clean"
+  },
+  "devDependencies": {
+    "@kairos/config": "workspace:*",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  }
+}

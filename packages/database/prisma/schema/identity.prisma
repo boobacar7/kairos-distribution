@@ -1,0 +1,208 @@
+// Identity and access. Two populations, two tables — the admin/customer boundary is schema,
+// not an application check (decisions-confirmed.md §2).
+
+model AdminUser {
+  id           String          @id @default(cuid())
+  email        String          @unique @db.Citext
+  passwordHash String?
+  firstName    String
+  lastName     String
+  role         AdminRole
+  status       AdminUserStatus @default(INVITED)
+  phone        String?
+  avatarUrl    String?
+  mfaEnabled   Boolean         @default(false)
+  mfaSecret    String?
+  lastLoginAt  DateTime?       @db.Timestamptz(6)
+  invitedById  String?
+  createdAt    DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime        @updatedAt @db.Timestamptz(6)
+  deletedAt    DateTime?       @db.Timestamptz(6)
+
+  invitedBy            AdminUser?             @relation("AdminUserInvites", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitees             AdminUser[]            @relation("AdminUserInvites")
+  permissionGrants     AdminPermissionGrant[] @relation("GrantSubject")
+  permissionGrantsMade AdminPermissionGrant[] @relation("GrantIssuer")
+  refreshTokens        RefreshToken[]
+  authTokens           AuthToken[]
+  auditLogs            AuditLog[]
+  orderStatusChanges   OrderStatusHistory[]
+  stockMovements       StockMovement[]
+  moderatedReviews     Review[]               @relation("ReviewModerator")
+  approvedRefunds      Refund[]               @relation("RefundApprover")
+  uploadedMedia        MediaAsset[]
+  notifications        Notification[]
+
+  @@index([role, status])
+  @@index([deletedAt])
+  @@index([invitedById])
+  @@map("admin_users")
+}
+
+model Permission {
+  key         String  @id
+  group       String
+  label       String
+  description String?
+
+  roles  RolePermission[]
+  grants AdminPermissionGrant[]
+
+  @@index([group])
+  @@map("permissions")
+}
+
+model RolePermission {
+  role          AdminRole
+  permissionKey String
+  permission    Permission @relation(fields: [permissionKey], references: [key], onDelete: Cascade)
+
+  @@id([role, permissionKey])
+  @@index([permissionKey])
+  @@map("role_permissions")
+}
+
+model AdminPermissionGrant {
+  id            String           @id @default(cuid())
+  adminUserId   String
+  permissionKey String
+  effect        PermissionEffect
+  reason        String?
+  grantedById   String?
+  expiresAt     DateTime?        @db.Timestamptz(6)
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+
+  adminUser  AdminUser  @relation("GrantSubject", fields: [adminUserId], references: [id], onDelete: Cascade)
+  grantedBy  AdminUser? @relation("GrantIssuer", fields: [grantedById], references: [id], onDelete: SetNull)
+  permission Permission @relation(fields: [permissionKey], references: [key], onDelete: Cascade)
+
+  @@unique([adminUserId, permissionKey])
+  @@index([permissionKey])
+  @@index([grantedById])
+  @@map("admin_permission_grants")
+}
+
+model Customer {
+  id               String         @id @default(cuid())
+  email            String         @unique @db.Citext
+  phone            String?        @unique
+  passwordHash     String?
+  firstName        String
+  lastName         String
+  status           CustomerStatus @default(ACTIVE)
+  emailVerifiedAt  DateTime?      @db.Timestamptz(6)
+  phoneVerifiedAt  DateTime?      @db.Timestamptz(6)
+  acceptsMarketing Boolean        @default(false)
+  marketingOptInAt DateTime?      @db.Timestamptz(6)
+  note             String?
+  lastLoginAt      DateTime?      @db.Timestamptz(6)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(6)
+  deletedAt        DateTime?      @db.Timestamptz(6)
+
+  /// Denormalised rollups. ordersCount excludes fully refunded orders (LOYAL rule).
+  /// totalSpent is lifetime net of refunds. lastOrderAt/firstOrderAt key off paidAt.
+  ordersCount       Int       @default(0)
+  totalSpent        BigInt    @default(0)
+  averageOrderValue Int       @default(0)
+  firstOrderAt      DateTime? @db.Timestamptz(6)
+  lastOrderAt       DateTime? @db.Timestamptz(6)
+
+  addresses           Address[]
+  orders              Order[]
+  carts               Cart[]
+  reviews             Review[]
+  wishlistItems       WishlistItem[]
+  refreshTokens       RefreshToken[]
+  authTokens          AuthToken[]
+  segmentMemberships  CustomerSegmentMembership[]
+  discountEligibility DiscountCustomer[]
+  discountRedemptions DiscountRedemption[]
+  refundRequests      Refund[]                    @relation("RefundRequester")
+  notifications       Notification[]
+
+  @@index([status, createdAt])
+  @@index([lastOrderAt])
+  @@index([totalSpent])
+  @@index([deletedAt])
+  @@map("customers")
+}
+
+model Address {
+  id                String    @id @default(cuid())
+  customerId        String
+  label             String?
+  firstName         String
+  lastName          String
+  phone             String
+  line1             String
+  line2             String?
+  city              String
+  neighbourhood     String?
+  region            String?
+  postalCode        String?
+  countryCode       String    @default("BF")
+  instructions      String?
+  isDefaultShipping Boolean   @default(false)
+  isDefaultBilling  Boolean   @default(false)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt         DateTime? @db.Timestamptz(6)
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, deletedAt])
+  @@map("addresses")
+}
+
+/// Opaque refresh token, stored hashed, rotated on every use. Exactly one of adminUserId /
+/// customerId, matching audience — CHECK in the integrity migration.
+model RefreshToken {
+  id              String        @id @default(cuid())
+  audience        TokenAudience
+  adminUserId     String?
+  customerId      String?
+  tokenHash       String        @unique
+  familyId        String
+  generation      Int           @default(0)
+  replacedById    String?       @unique
+  issuedAt        DateTime      @default(now()) @db.Timestamptz(6)
+  expiresAt       DateTime      @db.Timestamptz(6)
+  rotatedAt       DateTime?     @db.Timestamptz(6)
+  revokedAt       DateTime?     @db.Timestamptz(6)
+  revokedReason   String?
+  reuseDetectedAt DateTime?     @db.Timestamptz(6)
+  ipAddress       String?
+  userAgent       String?
+
+  adminUser  AdminUser?    @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  customer   Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  replacedBy RefreshToken? @relation("TokenRotation", fields: [replacedById], references: [id], onDelete: SetNull)
+  replaces   RefreshToken? @relation("TokenRotation")
+
+  @@index([familyId])
+  @@index([adminUserId])
+  @@index([customerId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model AuthToken {
+  id          String        @id @default(cuid())
+  type        AuthTokenType
+  audience    TokenAudience
+  adminUserId String?
+  customerId  String?
+  tokenHash   String        @unique
+  expiresAt   DateTime      @db.Timestamptz(6)
+  consumedAt  DateTime?     @db.Timestamptz(6)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(6)
+
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([type, expiresAt])
+  @@index([adminUserId])
+  @@index([customerId])
+  @@map("auth_tokens")
+}

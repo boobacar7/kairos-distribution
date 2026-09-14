@@ -1,0 +1,121 @@
+model Discount {
+  id                    String                       @id @default(cuid())
+  code                  String                       @unique @db.Citext
+  title                 String
+  description           String?
+  type                  DiscountType
+  /// Percent (0–100, two decimals) or whole XOF. Widened from Decimal(5,2) so a
+  /// plausible FIXED_AMOUNT (e.g. 10 000 XOF) fits; the type CHECK still applies.
+  value                 Decimal                      @db.Decimal(12, 2)
+  status                DiscountStatus               @default(DRAFT)
+  appliesTo             DiscountAppliesTo            @default(ALL_PRODUCTS)
+  customerEligibility   DiscountCustomerEligibility  @default(ALL)
+  minimumOrderAmount    Int?
+  minimumQuantity       Int?
+  usageLimitTotal       Int?
+  usageLimitPerCustomer Int?
+  usageCount            Int                          @default(0)
+  combinesWithOthers    Boolean                      @default(false)
+  startsAt              DateTime                     @db.Timestamptz(6)
+  endsAt                DateTime?                    @db.Timestamptz(6)
+  createdAt             DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime                     @updatedAt @db.Timestamptz(6)
+
+  products       DiscountProduct[]
+  collections    DiscountCollection[]
+  customers      DiscountCustomer[]
+  segments       DiscountSegment[]
+  redemptions    DiscountRedemption[]
+  orderDiscounts OrderDiscount[]
+  campaigns      Campaign[]
+
+  @@index([status, startsAt, endsAt])
+  @@map("discounts")
+}
+
+model DiscountProduct {
+  discountId String
+  productId  String
+  discount   Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([discountId, productId])
+  @@index([productId])
+  @@map("discount_products")
+}
+
+model DiscountCollection {
+  discountId   String
+  collectionId String
+  discount     Discount   @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([discountId, collectionId])
+  @@index([collectionId])
+  @@map("discount_collections")
+}
+
+model DiscountCustomer {
+  discountId String
+  customerId String
+  discount   Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@id([discountId, customerId])
+  @@index([customerId])
+  @@map("discount_customers")
+}
+
+model DiscountSegment {
+  discountId String
+  segmentId  String
+  discount   Discount        @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  segment    CustomerSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@id([discountId, segmentId])
+  @@index([segmentId])
+  @@map("discount_segments")
+}
+
+model DiscountRedemption {
+  id         String   @id @default(cuid())
+  discountId String
+  orderId    String
+  customerId String?
+  amount     Int
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  discount Discount  @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@unique([discountId, orderId])
+  @@index([discountId, customerId])
+  @@index([orderId])
+  @@map("discount_redemptions")
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  name         String
+  channel      CampaignChannel
+  status       CampaignStatus @default(DRAFT)
+  segmentId    String?
+  discountId   String?
+  subject      String?
+  body         String?
+  scheduledAt  DateTime?      @db.Timestamptz(6)
+  sentAt       DateTime?      @db.Timestamptz(6)
+  audienceSize Int            @default(0)
+  metrics      Json?
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(6)
+
+  segment  CustomerSegment? @relation(fields: [segmentId], references: [id], onDelete: SetNull)
+  discount Discount?        @relation(fields: [discountId], references: [id], onDelete: SetNull)
+
+  @@index([status, scheduledAt])
+  @@index([segmentId])
+  @@index([discountId])
+  @@map("campaigns")
+}

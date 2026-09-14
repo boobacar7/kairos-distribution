@@ -1,0 +1,44 @@
+{
+  "name": "@kairos/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared build, lint, format and environment configuration. Leaf package: no workspace dependencies.",
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./env": {
+      "types": "./dist/env/index.d.ts",
+      "default": "./dist/env/index.js"
+    },
+    "./eslint": "./eslint/base.mjs",
+    "./prettier": "./prettier/base.mjs",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/library.json": "./tsconfig/library.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "eslint",
+    "prettier",
+    "tsconfig"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "clean": "tsc --build --clean"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  }
+}

@@ -1,0 +1,87 @@
+model InventoryItem {
+  id                String   @id @default(cuid())
+  variantId         String   @unique
+  trackInventory    Boolean  @default(true)
+  onHandQty         Int      @default(0)
+  reservedQty       Int      @default(0)
+  availableQty      Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  isLowStock        Boolean  @default(false)
+  isOutOfStock      Boolean  @default(true)
+  binLocation       String?
+  version           Int      @default(0)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+
+  variant      ProductVariant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  movements    StockMovement[]
+  reservations StockReservation[]
+
+  @@index([isLowStock])
+  @@index([isOutOfStock])
+  @@index([availableQty])
+  @@map("inventory_items")
+}
+
+/// Append-only ledger. UPDATE and DELETE are blocked by trigger.
+model StockMovement {
+  id               BigInt            @id @default(autoincrement())
+  inventoryItemId  String
+  type             StockMovementType
+  onHandDelta      Int               @default(0)
+  reservedDelta    Int               @default(0)
+  onHandAfter      Int
+  reservedAfter    Int
+  availableAfter   Int
+  reason           String?
+  orderId          String?
+  reservationId    String?
+  referenceType    String?
+  referenceId      String?
+  actorType        ActorType         @default(SYSTEM)
+  actorAdminUserId String?
+  idempotencyKey   String            @unique
+  createdAt        DateTime          @default(now()) @db.Timestamptz(6)
+
+  inventoryItem InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  order         Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  reservation   StockReservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  actor         AdminUser?        @relation(fields: [actorAdminUserId], references: [id], onDelete: SetNull)
+
+  @@index([inventoryItemId, createdAt])
+  @@index([orderId])
+  @@index([type, createdAt])
+  @@index([reservationId])
+  @@index([actorAdminUserId])
+  @@map("stock_movements")
+}
+
+/// expiresAt is an absolute instant, snapshotted from inventory.reservationTtlMinutes at write.
+/// Payment architecture (awaiting-confirmation sweeper policy) is parked for Opus. The schema
+/// hook already present is PaymentStatus.REQUIRES_ACTION / OrderPaymentStatus.PENDING — the
+/// sweeper must not treat those as an unconditional 15-minute release. See guest-claim tests
+/// and the Phase 2 report.
+model StockReservation {
+  id              String                 @id @default(cuid())
+  inventoryItemId String
+  orderId         String?
+  orderItemId     String?                @unique
+  quantity        Int
+  status          StockReservationStatus @default(HELD)
+  expiresAt       DateTime               @db.Timestamptz(6)
+  consumedAt      DateTime?              @db.Timestamptz(6)
+  releasedAt      DateTime?              @db.Timestamptz(6)
+  releaseReason   String?
+  createdAt       DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime               @updatedAt @db.Timestamptz(6)
+
+  inventoryItem InventoryItem   @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  order         Order?          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem?      @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  movements     StockMovement[]
+
+  @@index([status, expiresAt])
+  @@index([inventoryItemId, status])
+  @@index([orderId])
+  @@map("stock_reservations")
+}

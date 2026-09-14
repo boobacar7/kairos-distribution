@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Ready for Phase 2: migrations and integration tests need a real database, and a service
+    # container is how CI gets one without Docker Compose. Harmless until then.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: kairos
+          POSTGRES_PASSWORD: kairos
+          POSTGRES_DB: kairos_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kairos -d kairos_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://kairos:kairos@localhost:5432/kairos_test?schema=public
+      SHADOW_DATABASE_URL: postgresql://kairos:kairos@localhost:5432/kairos_shadow_diff?schema=public
+      DATABASE_APP_URL: postgresql://kairos_app:kairos_app@localhost:5432/kairos_test?schema=public
+      SEED_ADMIN_EMAIL: ci-admin@example.test
+      SEED_ADMIN_PASSWORD: ci-admin-password-not-for-production
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fail if a .env file is committed
+        # The repository is public until the owner makes it private. A committed .env is a
+        # credential-rotation incident, not a cleanup task, so it fails the build rather than
+        # relying on .gitignore having been correct.
+        run: |
+          if git ls-files --error-unmatch '.env' '**/.env' '.env.local' '**/.env.local' 2>/dev/null; then
+            echo "::error::An environment file is tracked by git. Remove it and rotate anything it contained."
+            exit 1
+          fi
+          echo "No tracked .env files."
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Create shadow database
+        working-directory: packages/database
+        run: |
+          node --input-type=module -e "
+            import pg from 'pg';
+            const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+            await client.connect();
+            await client.query('CREATE DATABASE kairos_shadow_diff').catch((error) => {
+              if (error.code !== '42P04') throw error;
+            });
+            await client.end();
+          "
+
+      - name: Dependency boundaries
+        # Runs first: a boundary violation makes every downstream result meaningless.
+        run: pnpm check:boundaries
+
+      - name: Validate Prisma schema
+        run: pnpm --filter @kairos/database db:validate
+
+      - name: Apply migrations
+        run: pnpm --filter @kairos/database db:deploy
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit production dependencies
+        # Exceptions are per-advisory and justified in the "//auditConfig" block of the root
+        # package.json, never by lowering this threshold. A new advisory still fails the build.
+        run: pnpm audit --prod --audit-level high
+
+# Added by later phases, listed so the sequence is explicit rather than forgotten:
+#   Phase 4  the "no admin handler without a permission decorator" test
+#   Phase 6  Playwright E2E, axe accessibility assertions, Lighthouse budgets

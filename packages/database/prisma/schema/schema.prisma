@@ -1,0 +1,12 @@
+// Root Prisma schema. Owned exclusively by DATABASE_AGENT.
+// Target: stable prisma@7.10.x (not the 8.0 RC). URL lives in prisma.config.ts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+  runtime  = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
