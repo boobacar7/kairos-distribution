@@ -6,23 +6,39 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsconfig*.json", "package.json", "prisma/**", "prisma.config.ts"],
+      "inputs": [
+        "src/**",
+        "theme/**",
+        "tsconfig*.json",
+        "package.json",
+        "prisma/**",
+        "prisma.config.ts"
+      ],
       "outputs": ["dist/**"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsconfig*.json", "package.json", "prisma/**", "prisma.config.ts"],
+      "inputs": [
+        "src/**",
+        "theme/**",
+        "tsconfig*.json",
+        "package.json",
+        "prisma/**",
+        "prisma.config.ts"
+      ],
       "outputs": ["dist/**"]
     },
     "test": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**",
+        "theme/**",
         "tsconfig*.json",
         "package.json",
         "prisma/**",
         "prisma.config.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "vitest.config.mts"
       ],
       "outputs": [],
       "env": [

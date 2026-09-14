@@ -5,6 +5,7 @@
     { "path": "packages/config" },
     { "path": "packages/types" },
     { "path": "packages/validation" },
-    { "path": "packages/database" }
+    { "path": "packages/database" },
+    { "path": "packages/ui" }
   ]
 }

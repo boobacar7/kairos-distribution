@@ -19,12 +19,18 @@
     "./prettier": "./prettier/base.mjs",
     "./tsconfig/base.json": "./tsconfig/base.json",
     "./tsconfig/library.json": "./tsconfig/library.json",
+    "./theme": "./theme/kairos.css",
+    "./theme/tokens": {
+      "types": "./dist/theme/index.d.ts",
+      "default": "./dist/theme/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "eslint",
     "prettier",
+    "theme",
     "tsconfig"
   ],
   "scripts": {
@@ -34,6 +40,8 @@
     "clean": "tsc --build --clean"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "5.2.5",
+    "@fontsource/dm-serif-display": "5.2.5",
     "zod": "4.6.5"
   },
   "devDependencies": {

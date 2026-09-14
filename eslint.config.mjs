@@ -1,3 +1,6 @@
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import globals from 'globals';
+
 import { baseConfig, frontendForbiddenImports } from '@kairos/config/eslint';
 
 /**
@@ -9,6 +12,16 @@ import { baseConfig, frontendForbiddenImports } from '@kairos/config/eslint';
  */
 export default [
   ...baseConfig,
+  {
+    ignores: ['**/gallery-dist/**'],
+  },
+  {
+    files: ['**/*.{jsx,tsx}'],
+    ...jsxA11y.flatConfigs.recommended,
+    languageOptions: {
+      globals: { ...globals.browser },
+    },
+  },
   {
     files: ['apps/storefront/**/*.{ts,tsx}', 'apps/admin/**/*.{ts,tsx}'],
     rules: {

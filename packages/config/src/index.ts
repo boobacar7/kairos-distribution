@@ -9,3 +9,23 @@ export {
   type Env,
   type NodeEnv,
 } from './env/index.js';
+
+export {
+  APPROVED_PAIRS,
+  PALETTE,
+  PALETTE_CSS_NAMES,
+  PALETTE_HEXES,
+  TYPEFACES,
+  WCAG_AA_LARGE_TEXT,
+  WCAG_AA_TEXT,
+  WCAG_AA_UI,
+  contrastRatio,
+  isApprovedPair,
+  meetsWcagAa,
+  paletteContrast,
+  relativeLuminance,
+  type ContrastPair,
+  type ContrastRole,
+  type PaletteHex,
+  type PaletteName,
+} from './theme/index.js';
