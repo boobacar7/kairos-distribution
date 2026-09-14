@@ -101,6 +101,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Audit production dependencies
+        # Exceptions are per-advisory and justified in the "//auditConfig" block of the root
+        # package.json, never by lowering this threshold. A new advisory still fails the build.
         run: pnpm audit --prod --audit-level high
 
 # Added by later phases, listed so the sequence is explicit rather than forgotten:

@@ -24,6 +24,28 @@
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres"
   },
+  "//auditConfig": [
+    "Reviewed audit exceptions. Each entry is a specific advisory, never a severity threshold or a",
+    "whole package, so a NEW advisory in the same dependency still fails the build.",
+    "",
+    "All three live in the Prisma CLI, which is a devDependency of @kairos/database. They surface",
+    "under `pnpm audit --prod` only because @prisma/client declares `prisma` as an OPTIONAL PEER",
+    "dependency, so the resolver walks into the CLI's tree; nothing here is loaded at runtime.",
+    "prisma@7.10.0 is the newest stable 7.x, so no patched release exists on our pinned line.",
+    "",
+    "GHSA-ggr8-5vv4-36mx  deepmerge-ts  <- prisma > @prisma/config. Build-time config loading only.",
+    "GHSA-3f6p-5ww8-9rcr  mysql2        <- prisma. A MySQL driver. Kairos is PostgreSQL-only and the",
+    "GHSA-rgwj-5xj2-c3m3  mysql2           env schema rejects any non-PostgreSQL DATABASE_URL, so",
+    "                                      this code path cannot execute.",
+    "",
+    "Re-check when Prisma 8 reaches stable and at the Phase 15 security review. SECURITY_AGENT owns",
+    "this list; adding to it requires the same written justification."
+  ],
+  "pnpm": {
+    "auditConfig": {
+      "ignoreGhsas": ["GHSA-ggr8-5vv4-36mx", "GHSA-3f6p-5ww8-9rcr", "GHSA-rgwj-5xj2-c3m3"]
+    }
+  },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@kairos/config": "workspace:*",
