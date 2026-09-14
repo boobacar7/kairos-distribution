@@ -4,6 +4,7 @@ import { money } from '@kairos/types/money';
 import type { CatalogProductListItem } from '@kairos/validation/catalog';
 
 import { t } from '../../messages/t';
+import { AddToCartButton } from './AddToCartButton';
 
 function stockProps(product: CatalogProductListItem): {
   stock?: 'inStock' | 'out';
@@ -80,6 +81,9 @@ export function CatalogueProductCard({ product }: { product: CatalogProductListI
         >
           {t('catalog.viewProduct', { name: product.name })}
         </a>
+        {product.variantId && product.availability.purchasable ? (
+          <AddToCartButton variantId={product.variantId} />
+        ) : null}
       </CardBody>
     </Card>
   );

@@ -1,8 +1,8 @@
 import { t } from '../../messages/t';
 import { CartGlyph } from './icons';
 
-export function CartIcon({ count = 0, demo = false }: { count?: number; demo?: boolean }) {
-  const label = count > 0 ? t(demo ? 'cart.demoCount' : 'cart.count', { count }) : t('cart.icon');
+export function CartIcon({ count = 0 }: { count?: number }) {
+  const label = count > 0 ? t('cart.count', { count }) : t('cart.icon');
 
   return (
     <a

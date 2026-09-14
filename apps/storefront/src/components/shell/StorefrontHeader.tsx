@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
+import { useOptionalCart } from '../../cart/cart-provider';
 import { t } from '../../messages/t';
 import { BrandMark } from './BrandMark';
 import { CartIcon } from './CartIcon';
@@ -22,14 +23,10 @@ function navIsCurrent(key: (typeof DESKTOP_NAV)[number]['key'], pathname: string
   return false;
 }
 
-export function StorefrontHeader({
-  cartCount = 0,
-  demoCart = false,
-}: {
-  cartCount?: number;
-  demoCart?: boolean;
-}) {
+export function StorefrontHeader({ cartCount }: { cartCount?: number }) {
   const pathname = usePathname();
+  const cart = useOptionalCart();
+  const count = cart?.itemCount ?? cartCount ?? 0;
 
   return (
     <header className="bg-ivory/95 border-beige sticky top-0 z-40 border-b backdrop-blur">
@@ -81,7 +78,7 @@ export function StorefrontHeader({
           >
             <AccountGlyph />
           </a>
-          <CartIcon count={cartCount} demo={demoCart} />
+          <CartIcon count={count} />
         </div>
       </div>
     </header>

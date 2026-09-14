@@ -5,10 +5,11 @@ import { boutiqueHref } from './href';
 import { productJsonLd } from './json-ld';
 
 describe('prepareAddToCart', () => {
-  it('refuses to invent a cart even with a valid variantId', () => {
+  it('adds a valid variant to the guest cart', () => {
     expect(prepareAddToCart({ variantId: 'v1', quantity: 2 })).toEqual({
-      ok: false,
-      code: 'CART_NOT_IMPLEMENTED',
+      ok: true,
+      itemCount: 2,
+      items: [{ variantId: 'v1', quantity: 2 }],
     });
   });
 

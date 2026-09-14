@@ -33,7 +33,19 @@ export const messages = {
 
   'cart.icon': 'Panier',
   'cart.count': '{count} article(s) dans le panier',
-  'cart.demoCount': '[TEST] {count} articles dans le panier (démo visuelle)',
+  'cart.added': 'Article ajouté au panier.',
+  'cart.empty': 'Votre panier est vide.',
+  'cart.emptyBody': 'Parcourez la boutique pour ajouter des produits.',
+  'cart.continue': 'Continuer les achats',
+  'cart.subtotal': 'Sous-total',
+  'cart.remove': 'Retirer {name}',
+  'cart.unavailable': 'Ce produit n’est plus disponible.',
+  'cart.variantUnavailable': 'Cette variante n’existe plus.',
+  'cart.error': 'Impossible de vérifier le panier. Réessayez.',
+  'cart.unknownItem': 'Article indisponible',
+  'cart.unitPrice': 'Prix unitaire',
+  'cart.lineSubtotal': 'Sous-total de la ligne',
+  'cart.sku': 'SKU {sku}',
 
   'home.hero': 'À la une',
   'home.trust': 'Confiance',
@@ -96,8 +108,6 @@ export const messages = {
   'catalog.quantity': 'Quantité',
   'catalog.decrease': 'Diminuer la quantité',
   'catalog.increase': 'Augmenter la quantité',
-  'catalog.cartPending':
-    'Le panier n’est pas encore disponible. Aucun article n’a été réservé ni commandé.',
   'catalog.unavailable': 'Ce produit ne peut pas être ajouté pour le moment.',
   'catalog.inventoryError':
     'La disponibilité de ce produit ne peut pas être confirmée. Il n’est pas marqué en rupture de stock.',

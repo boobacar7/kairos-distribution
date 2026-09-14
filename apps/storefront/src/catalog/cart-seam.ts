@@ -1,24 +1,22 @@
+import { addGuestCartItem, guestCartItemCount, type GuestCartItem } from '../cart/guest-cart';
+
 export type AddToCartIntent = {
   variantId: string;
   quantity: number;
 };
 
-export type AddToCartSeamResult = {
-  ok: false;
-  code: 'CART_NOT_IMPLEMENTED' | 'INVALID_INTENT';
-};
+export type AddToCartResult =
+  { ok: true; itemCount: number; items: GuestCartItem[] } | { ok: false; code: 'INVALID_INTENT' };
 
 /**
- * Cart seam for the catalogue slice.
+ * Add-to-cart entry for the storefront.
  *
- * Architecture defines a server cart (`POST /v1/cart/:id/items` with `{ variantId, quantity }`).
- * That module is not implemented yet. This function is the only add-to-cart entry point on the
- * storefront: it validates the intended payload and refuses to invent a cart, cookie, reservation
- * or stock mutation.
+ * Persists `{ variantId, quantity }` only (no prices). Catalogue price and availability
+ * are reconciled by `POST /v1/cart/preview`. Does not reserve stock or create an order.
+ * The payload shape is the same as a future server cart item write.
  */
-export function prepareAddToCart(intent: AddToCartIntent): AddToCartSeamResult {
-  if (!intent.variantId || !Number.isInteger(intent.quantity) || intent.quantity < 1) {
-    return { ok: false, code: 'INVALID_INTENT' };
-  }
-  return { ok: false, code: 'CART_NOT_IMPLEMENTED' };
+export function prepareAddToCart(intent: AddToCartIntent): AddToCartResult {
+  const result = addGuestCartItem(intent.variantId, intent.quantity);
+  if (!result.ok) return result;
+  return { ok: true, itemCount: guestCartItemCount(result.items), items: result.items };
 }

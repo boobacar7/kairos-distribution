@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 
-import { PlaceholderPage, placeholderMetadata } from '../../components/shell/PlaceholderPage';
+import { CartPageView } from '../../components/cart/CartPageView';
+import { t } from '../../messages/t';
 
-export const metadata: Metadata = placeholderMetadata('pages.cart.title');
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: t('pages.cart.title'),
+};
 
 export default function CartPage() {
-  return <PlaceholderPage titleKey="pages.cart.title" />;
+  return <CartPageView />;
 }

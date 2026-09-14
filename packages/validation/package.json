@@ -19,6 +19,10 @@
       "types": "./dist/catalog/index.d.ts",
       "default": "./dist/catalog/index.js"
     },
+    "./cart": {
+      "types": "./dist/cart/index.d.ts",
+      "default": "./dist/cart/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
