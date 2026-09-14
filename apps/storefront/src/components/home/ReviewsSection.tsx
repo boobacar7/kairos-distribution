@@ -2,6 +2,7 @@ import { Badge, Card, CardBody, EmptyState, RatingStars } from '@kairos/ui';
 
 import type { ReviewsSummary, VerifiedReview } from '../../content/contract';
 import { t } from '../../messages/t';
+import { StarRow } from './FeaturedRow';
 import { HomeSection } from './HomeSection';
 
 function formatAverage(value: number): string {
@@ -21,9 +22,9 @@ export function ReviewsSection({
       count: summary.reviewCount,
     });
     return (
-      <section id="avis" aria-labelledby="avis-titre" className="px-gutter py-4 md:px-gutter-lg">
-        <div className="border-beige mx-auto flex max-w-7xl flex-col gap-4 rounded-xl border bg-ivory px-4 py-4 shadow-soft md:flex-row md:items-center md:justify-between md:px-8">
-          <div>
+      <section id="avis" aria-labelledby="avis-titre" className="px-gutter py-3 md:px-gutter-lg">
+        <div className="border-beige mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 rounded-xl border bg-ivory px-4 py-3 shadow-soft md:flex-nowrap md:gap-4 md:px-8">
+          <div className="min-w-0">
             <h2 id="avis-titre" className="text-botanical text-body font-semibold">
               {summary.headline}
             </h2>
@@ -31,10 +32,11 @@ export function ReviewsSection({
               <p className="text-botanical/80 max-w-xs text-caption">{summary.supporting}</p>
             ) : null}
           </div>
-          <div className="flex flex-col items-start gap-1 md:items-center">
-            <RatingStars
+          <div className="flex flex-col items-start gap-0.5 md:items-center">
+            <StarRow
               value={summary.averageRating}
               label={t('reviews.rating', { value: summary.averageRating })}
+              size="body"
             />
             <p className="text-botanical text-caption">{averageLabel}</p>
           </div>

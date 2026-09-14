@@ -22,7 +22,7 @@ export function HeroPicture({
         alt={desktop.alt}
         width={desktop.width ?? 1600}
         height={desktop.height ?? 900}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover object-left md:object-center"
         fetchPriority={priority ? 'high' : 'auto'}
         loading={priority ? 'eager' : 'lazy'}
       />

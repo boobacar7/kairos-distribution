@@ -18,7 +18,8 @@
 
 .home-hero [data-surface='inverse'] .relative.min-h-72,
 .home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
-  min-height: 16.5rem;
+  /* ~2:1 so the mobile hero crop is not side-clipped */
+  min-height: 11.75rem;
 }
 
 @media (min-width: 48rem) {
@@ -42,8 +43,28 @@
 }
 
 .home-hero [data-surface='inverse'] a[data-cta] {
+  /* Photography already includes the Découvrir pill. Keep a real hit-target on top. */
+  position: absolute;
+  left: 1.25rem;
+  bottom: 2.5rem;
+  z-index: 15;
+  width: 9.25rem;
+  height: 2.75rem;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  background-color: transparent;
   border-radius: var(--radius-full);
-  padding-inline: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .home-hero [data-surface='inverse'] a[data-cta] {
+    left: 2.75rem;
+    bottom: 3.25rem;
+    width: 10.5rem;
+  }
 }
 
 .home-hero [role='toolbar'] {

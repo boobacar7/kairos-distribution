@@ -6,18 +6,30 @@ import { t } from '../../messages/t';
 import { PlusGlyph } from '../shell/icons';
 
 function formatPrice(amount: number): string {
-  return `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(amount)} ${t('currency.code')}`;
+  const grouped = Math.trunc(amount)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return `${grouped} ${t('currency.code')}`;
 }
 
-function StarRow({ value, label }: { value: number; label: string }) {
+function StarRow({
+  value,
+  label,
+  size = 'caption',
+}: {
+  value: number;
+  label: string;
+  size?: 'caption' | 'body';
+}) {
   const rounded = Math.round(value);
+  const type = size === 'body' ? 'text-body' : 'text-caption';
   return (
     <span className="inline-flex items-center gap-0.5" aria-label={label}>
       {Array.from({ length: 5 }, (_, index) => (
         <span
           key={index}
           aria-hidden="true"
-          className={index < rounded ? 'text-caption text-coral' : 'text-caption text-beige'}
+          className={index < rounded ? `${type} text-coral` : `${type} text-beige`}
         >
           ★
         </span>
@@ -25,6 +37,8 @@ function StarRow({ value, label }: { value: number; label: string }) {
     </span>
   );
 }
+
+export { StarRow };
 
 export function FeaturedRow({ products }: { products: readonly FeaturedProduct[] }) {
   if (products.length === 0) {
@@ -65,9 +79,11 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
               product.rating != null && product.reviewCount != null && product.reviewCount > 0
                 ? product.rating
                 : undefined;
+            const plusClassName =
+              'bg-botanical text-ivory inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full md:h-8 md:w-8';
             return (
               <li key={product.id}>
-                <article className="flex items-center gap-2 md:gap-3">
+                <article className="flex flex-col gap-1.5 md:flex-row md:items-center md:gap-3">
                   <a href={`/produit/${product.slug}`} className="shrink-0">
                     {product.image ? (
                       <img
@@ -75,21 +91,21 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         alt={product.image.alt}
                         width={product.image.width ?? 160}
                         height={product.image.height ?? 160}
-                        className="h-16 w-16 rounded-lg object-cover md:h-20 md:w-20"
+                        className="h-[4.5rem] w-full rounded-lg object-cover md:h-[7.5rem] md:w-[7.5rem]"
                         loading="lazy"
                       />
                     ) : (
-                      <span className="bg-soft-green block h-16 w-16 rounded-lg md:h-20 md:w-20" />
+                      <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[7.5rem] md:w-[7.5rem]" />
                     )}
                   </a>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
-                        <h3 className="text-botanical truncate text-caption font-semibold md:text-body-sm">
+                        <h3 className="text-botanical text-caption leading-tight font-semibold md:text-body-sm">
                           {product.name}
                         </h3>
                         {product.subtitle ? (
-                          <p className="text-botanical/70 truncate text-caption">
+                          <p className="text-botanical/70 text-caption leading-tight">
                             {product.subtitle}
                           </p>
                         ) : null}
@@ -99,26 +115,33 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       ) : null}
                     </div>
                     {rating !== undefined ? (
-                      <p className="mt-0.5 flex flex-wrap items-center gap-1">
+                      <p className="mt-0.5 flex flex-nowrap items-center gap-1">
                         <StarRow value={rating} label={t('reviews.rating', { value: rating })} />
                         <span className="text-botanical/70 text-caption">
                           {t('product.stars', { count: product.reviewCount ?? 0 })}
                         </span>
                       </p>
                     ) : null}
-                    <div className="mt-1 flex items-center justify-between gap-1">
-                      <p className="text-botanical text-caption font-semibold md:text-body-sm">
+                    <div className="mt-1 flex items-center justify-between gap-1 md:justify-start">
+                      <p className="text-botanical text-caption whitespace-nowrap font-semibold md:text-body-sm">
                         {formatPrice(product.price)}
                       </p>
                       <a
                         href={`/produit/${product.slug}`}
-                        className="bg-botanical text-ivory inline-flex h-8 w-8 items-center justify-center rounded-full"
+                        className={`${plusClassName} md:hidden`}
                         aria-label={t('product.add', { name: product.name })}
                       >
                         <PlusGlyph className="h-3.5 w-3.5" />
                       </a>
                     </div>
                   </div>
+                  <a
+                    href={`/produit/${product.slug}`}
+                    className={`${plusClassName} hidden md:inline-flex`}
+                    aria-label={t('product.add', { name: product.name })}
+                  >
+                    <PlusGlyph className="h-3.5 w-3.5" />
+                  </a>
                 </article>
               </li>
             );

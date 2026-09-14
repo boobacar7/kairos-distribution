@@ -23,13 +23,13 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
               <img
                 src="/media/promo-leaf-left.jpg"
                 alt=""
-                className="pointer-events-none absolute bottom-0 left-0 hidden h-full w-28 object-cover md:block"
+                className="pointer-events-none absolute bottom-0 left-0 h-full w-16 object-cover md:w-28"
                 aria-hidden="true"
               />
               <img
                 src="/media/promo-leaf-right.jpg"
                 alt=""
-                className="pointer-events-none absolute right-0 bottom-0 hidden h-full w-28 object-cover md:block"
+                className="pointer-events-none absolute right-0 bottom-0 h-full w-16 object-cover md:w-28"
                 aria-hidden="true"
               />
               <div className="relative flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between md:gap-8 md:px-24">
