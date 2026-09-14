@@ -3,7 +3,11 @@ packages:
   - 'apps/*'
 
 # pnpm 10 does not run dependency lifecycle scripts unless they are allow-listed.
-# @prisma/client's postinstall runs `prisma generate`, which fails until DATABASE_AGENT
-# lands the schema in Phase 2. It is deliberately not allow-listed yet; the database
-# package runs `prisma generate` explicitly from its own `db:generate` script instead.
-onlyBuiltDependencies: []
+# @prisma/engines postinstall downloads the schema engine Prisma CLI needs to validate
+# and migrate. prisma's own postinstall is a no-op beyond the engines package.
+# @prisma/client generate is still run explicitly from @kairos/database scripts so a
+# missing schema fails at `pnpm --filter @kairos/database generate`, not at install.
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+  - esbuild

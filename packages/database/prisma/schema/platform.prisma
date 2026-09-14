@@ -1,0 +1,114 @@
+model OutboxEvent {
+  id          BigInt       @id @default(autoincrement())
+  topic       String
+  dedupeKey   String       @unique
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  availableAt DateTime     @default(now()) @db.Timestamptz(6)
+  attempts    Int          @default(0)
+  maxAttempts Int          @default(8)
+  lastError   String?
+  lockedAt    DateTime?    @db.Timestamptz(6)
+  lockedBy    String?
+  processedAt DateTime?    @db.Timestamptz(6)
+  createdAt   DateTime     @default(now()) @db.Timestamptz(6)
+
+  @@index([status, availableAt])
+  @@index([topic, status])
+  @@map("outbox_events")
+}
+
+model IdempotencyKey {
+  id             String            @id @default(cuid())
+  scope          String
+  key            String
+  requestHash    String
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  actorType      ActorType         @default(CUSTOMER)
+  actorId        String?
+  responseStatus Int?
+  responseBody   Json?
+  resourceType   String?
+  resourceId     String?
+  lockedAt       DateTime          @default(now()) @db.Timestamptz(6)
+  completedAt    DateTime?         @db.Timestamptz(6)
+  expiresAt      DateTime          @db.Timestamptz(6)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+
+  @@unique([scope, key])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+model AuditLog {
+  id               BigInt    @id @default(autoincrement())
+  actorType        ActorType
+  actorAdminUserId String?
+  actorLabel       String?
+  action           String
+  entityType       String
+  entityId         String
+  previousValue    Json?
+  newValue         Json?
+  metadata         Json?
+  ipAddress        String?
+  userAgent        String?
+  requestId        String?
+  createdAt        DateTime  @default(now()) @db.Timestamptz(6)
+
+  actor AdminUser? @relation(fields: [actorAdminUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorAdminUserId, createdAt])
+  @@index([action, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model NotificationTemplate {
+  key       String               @id
+  channel   NotificationChannel
+  audience  NotificationAudience
+  locale    String               @default("fr")
+  subject   String?
+  body      String               @default("")
+  isActive  Boolean              @default(false)
+  createdAt DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime             @updatedAt @db.Timestamptz(6)
+
+  notifications Notification[]
+
+  @@map("notification_templates")
+}
+
+model Notification {
+  id                String               @id @default(cuid())
+  audience          NotificationAudience
+  customerId        String?
+  adminUserId       String?
+  templateKey       String
+  channel           NotificationChannel
+  providerKey       String?
+  recipient         String?
+  data              Json
+  status            NotificationStatus   @default(QUEUED)
+  dedupeKey         String               @unique
+  providerMessageId String?
+  error             String?
+  relatedEntityType String?
+  relatedEntityId   String?
+  sentAt            DateTime?            @db.Timestamptz(6)
+  failedAt          DateTime?            @db.Timestamptz(6)
+  readAt            DateTime?            @db.Timestamptz(6)
+  createdAt         DateTime             @default(now()) @db.Timestamptz(6)
+
+  template NotificationTemplate @relation(fields: [templateKey], references: [key], onDelete: Restrict)
+  customer Customer?            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  admin    AdminUser?           @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([audience, status, createdAt])
+  @@index([customerId, createdAt])
+  @@index([adminUserId, readAt])
+  @@index([templateKey])
+  @@map("notifications")
+}

@@ -42,6 +42,10 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://kairos:kairos@localhost:5432/kairos_test?schema=public
+      SHADOW_DATABASE_URL: postgresql://kairos:kairos@localhost:5432/kairos_shadow_diff?schema=public
+      DATABASE_APP_URL: postgresql://kairos_app:kairos_app@localhost:5432/kairos_test?schema=public
+      SEED_ADMIN_EMAIL: ci-admin@example.test
+      SEED_ADMIN_PASSWORD: ci-admin-password-not-for-production
 
     steps:
       - uses: actions/checkout@v5
@@ -69,9 +73,28 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Create shadow database
+        working-directory: packages/database
+        run: |
+          node --input-type=module -e "
+            import pg from 'pg';
+            const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+            await client.connect();
+            await client.query('CREATE DATABASE kairos_shadow_diff').catch((error) => {
+              if (error.code !== '42P04') throw error;
+            });
+            await client.end();
+          "
+
       - name: Dependency boundaries
         # Runs first: a boundary violation makes every downstream result meaningless.
         run: pnpm check:boundaries
+
+      - name: Validate Prisma schema
+        run: pnpm --filter @kairos/database db:validate
+
+      - name: Apply migrations
+        run: pnpm --filter @kairos/database db:deploy
 
       - name: Lint
         run: pnpm lint
@@ -106,7 +129,5 @@ jobs:
         run: pnpm audit --prod --audit-level high
 
 # Added by later phases, listed so the sequence is explicit rather than forgotten:
-#   Phase 2  prisma validate, prisma migrate deploy, prisma migrate diff drift detection,
-#            the Category 1 enum-parity and Category 2 seeded-key tests
 #   Phase 4  the "no admin handler without a permission decorator" test
 #   Phase 6  Playwright E2E, axe accessibility assertions, Lighthouse budgets

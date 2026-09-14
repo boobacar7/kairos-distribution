@@ -24,7 +24,8 @@ out/
 *.tsbuildinfo
 
 # Prisma generated client (regenerated from the schema; never committed)
-packages/database/generated/
+packages/database/generated
+packages/database/src/generated/
 **/.prisma/
 
 # Test and coverage output

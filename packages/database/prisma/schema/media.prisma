@@ -1,0 +1,39 @@
+model MediaAsset {
+  id                    String      @id @default(cuid())
+  providerKey           String
+  providerAssetId       String
+  folder                MediaFolder
+  url                   String
+  fileName              String
+  mimeType              String
+  format                String?
+  bytes                 Int
+  width                 Int?
+  height                Int?
+  blurDataUrl           String?
+  altText               String?
+  title                 String?
+  checksum              String?     @unique
+  metadata              Json?
+  uploadedByAdminUserId String?
+  createdAt             DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime    @updatedAt @db.Timestamptz(6)
+  deletedAt             DateTime?   @db.Timestamptz(6)
+
+  uploadedBy         AdminUser?          @relation(fields: [uploadedByAdminUserId], references: [id], onDelete: SetNull)
+  categoryImages     Category[]
+  collectionImages   Collection[]
+  productImages      ProductImage[]
+  reviewPhotos       Review[]
+  heroDesktopSlides  HeroSlide[]         @relation("HeroDesktopImage")
+  heroMobileSlides   HeroSlide[]         @relation("HeroMobileImage")
+  promotionalBanners PromotionalBanner[]
+  testimonialAvatars Testimonial[]
+  staticPageImages   StaticPage[]
+
+  @@unique([providerKey, providerAssetId])
+  @@index([folder, createdAt])
+  @@index([deletedAt])
+  @@index([uploadedByAdminUserId])
+  @@map("media_assets")
+}

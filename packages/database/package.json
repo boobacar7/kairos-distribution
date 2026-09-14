@@ -15,25 +15,34 @@
   },
   "files": [
     "dist",
-    "prisma"
+    "prisma",
+    "prisma.config.ts"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "typecheck": "tsc --build",
-    "test": "vitest run --passWithNoTests",
+    "generate": "prisma generate",
+    "build": "prisma generate && tsc --build",
+    "typecheck": "prisma generate && tsc --build",
+    "test": "prisma generate && vitest run",
     "clean": "tsc --build --clean",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "db:validate": "prisma validate"
+    "db:validate": "prisma validate",
+    "db:diff": "prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema --exit-code",
+    "db:seed": "tsx prisma/seed/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "7.10.0"
+    "@kairos/types": "workspace:*",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "pg": "8.16.3"
   },
   "devDependencies": {
     "@kairos/config": "workspace:*",
+    "@types/pg": "8.15.6",
     "prisma": "7.10.0",
+    "tsx": "4.23.13",
     "typescript": "6.0.3",
     "vitest": "5.0.0"
   }

@@ -1,0 +1,175 @@
+model HeroSlide {
+  id             String       @id @default(cuid())
+  title          String
+  subtitle       String?
+  ctaLabel       String?
+  ctaUrl         String?
+  textPosition   TextPosition @default(LEFT)
+  desktopAssetId String
+  mobileAssetId  String?
+  isActive       Boolean      @default(false)
+  position       Int          @default(0)
+  startsAt       DateTime?    @db.Timestamptz(6)
+  endsAt         DateTime?    @db.Timestamptz(6)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
+
+  desktopAsset MediaAsset  @relation("HeroDesktopImage", fields: [desktopAssetId], references: [id], onDelete: Restrict)
+  mobileAsset  MediaAsset? @relation("HeroMobileImage", fields: [mobileAssetId], references: [id], onDelete: SetNull)
+
+  @@index([isActive, position])
+  @@index([startsAt, endsAt])
+  @@index([desktopAssetId])
+  @@index([mobileAssetId])
+  @@map("hero_slides")
+}
+
+model PromotionalBanner {
+  id         String          @id @default(cuid())
+  title      String
+  subtitle   String?
+  ctaLabel   String?
+  ctaUrl     String?
+  assetId    String?
+  placement  BannerPlacement @default(HOMEPAGE_MID)
+  colorToken String?
+  isActive   Boolean         @default(false)
+  position   Int             @default(0)
+  startsAt   DateTime?       @db.Timestamptz(6)
+  endsAt     DateTime?       @db.Timestamptz(6)
+  createdAt  DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime        @updatedAt @db.Timestamptz(6)
+
+  asset MediaAsset? @relation(fields: [assetId], references: [id], onDelete: SetNull)
+
+  @@index([placement, isActive, position])
+  @@index([assetId])
+  @@map("promotional_banners")
+}
+
+model Testimonial {
+  id             String    @id @default(cuid())
+  authorName     String
+  authorLocation String?
+  avatarAssetId  String?
+  quote          String
+  rating         Int?
+  isActive       Boolean   @default(false)
+  position       Int       @default(0)
+  publishedAt    DateTime? @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+
+  avatar MediaAsset? @relation(fields: [avatarAssetId], references: [id], onDelete: SetNull)
+
+  @@index([isActive, position])
+  @@index([avatarAssetId])
+  @@map("testimonials")
+}
+
+model FaqCategory {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  position Int     @default(0)
+  isActive Boolean @default(true)
+
+  entries FaqEntry[]
+
+  @@map("faq_categories")
+}
+
+model FaqEntry {
+  id         String   @id @default(cuid())
+  categoryId String?
+  question   String
+  answer     String
+  position   Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  category FaqCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId, position])
+  @@index([isActive, position])
+  @@map("faq_entries")
+}
+
+model StaticPage {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  body           String        @default("")
+  seoTitle       String?
+  seoDescription String?
+  ogImageAssetId String?
+  status         ContentStatus @default(DRAFT)
+  publishedAt    DateTime?     @db.Timestamptz(6)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  ogImage MediaAsset? @relation(fields: [ogImageAssetId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([ogImageAssetId])
+  @@map("static_pages")
+}
+
+model FooterSection {
+  id       String  @id @default(cuid())
+  title    String
+  position Int     @default(0)
+  isActive Boolean @default(true)
+
+  links FooterLink[]
+
+  @@map("footer_sections")
+}
+
+model FooterLink {
+  id            String  @id @default(cuid())
+  sectionId     String
+  label         String
+  url           String
+  position      Int     @default(0)
+  isActive      Boolean @default(true)
+  opensInNewTab Boolean @default(false)
+
+  section FooterSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId, position])
+  @@map("footer_links")
+}
+
+model SocialLink {
+  id       String  @id @default(cuid())
+  platform String  @unique
+  url      String
+  iconKey  String?
+  position Int     @default(0)
+  isActive Boolean @default(true)
+
+  @@map("social_links")
+}
+
+model HomepageSectionSetting {
+  key       String   @id
+  label     String
+  isEnabled Boolean  @default(true)
+  position  Int
+  config    Json?
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("homepage_section_settings")
+}
+
+model SiteSetting {
+  key       String   @id
+  group     String
+  value     Json
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([group])
+  @@map("site_settings")
+}

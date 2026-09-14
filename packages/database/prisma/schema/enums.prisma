@@ -1,0 +1,313 @@
+// Category 1 closed-domain enums. Member sets must equal @kairos/types.
+// SCREAMING_SNAKE_CASE on both sides (architecture §3.5, data-model §4).
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  ORDER_MANAGER
+  SUPPORT
+}
+
+enum AdminUserStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+enum TokenAudience {
+  CUSTOMER
+  ADMIN
+}
+
+enum AuthTokenType {
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+  PHONE_VERIFICATION
+  ADMIN_INVITE
+}
+
+enum AddressKind {
+  SHIPPING
+  BILLING
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CollectionType {
+  MANUAL
+  AUTOMATIC
+}
+
+enum RuleMatchMode {
+  ALL
+  ANY
+}
+
+enum CollectionRuleField {
+  PRICE
+  CATEGORY
+  TAG
+  PROMOTION
+  FEATURED
+  STOCK_STATUS
+}
+
+enum RuleOperator {
+  EQUALS
+  NOT_EQUALS
+  GREATER_THAN
+  GREATER_THAN_OR_EQUAL
+  LESS_THAN
+  LESS_THAN_OR_EQUAL
+  IN
+  NOT_IN
+  CONTAINS
+  IS_TRUE
+  IS_FALSE
+}
+
+enum CollectionMembershipSource {
+  MANUAL
+  AUTOMATIC
+}
+
+enum StockMovementType {
+  SUPPLIER_DELIVERY
+  MANUAL_ADJUSTMENT
+  ORDER_RESERVATION
+  RESERVATION_RELEASE
+  RESERVATION_EXPIRY
+  ORDER_FULFILMENT
+  ORDER_CANCELLATION_RESTOCK
+  RETURN_RESTOCK
+  DAMAGE_WRITE_OFF
+  STOCKTAKE_CORRECTION
+}
+
+enum StockReservationStatus {
+  HELD
+  CONSUMED
+  RELEASED
+  EXPIRED
+}
+
+enum ActorType {
+  ADMIN_USER
+  CUSTOMER
+  SYSTEM
+}
+
+enum CartStatus {
+  ACTIVE
+  CONVERTED
+  ABANDONED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  FAILED
+}
+
+/// Snapshot on every order. Architecture's TaxTreatment; stored as taxMode so a regime
+/// change never rewrites historical totals. Members: INCLUSIVE | EXCLUSIVE.
+enum TaxMode {
+  INCLUSIVE
+  EXCLUSIVE
+}
+
+enum PaymentStatus {
+  PENDING
+  REQUIRES_ACTION
+  AUTHORIZED
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentTxnType {
+  INTENT
+  AUTHORIZATION
+  CAPTURE
+  SALE
+  REFUND
+  VOID
+  CHARGEBACK
+}
+
+enum PaymentTxnStatus {
+  PENDING
+  REQUIRES_ACTION
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum DiscountStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  EXPIRED
+}
+
+enum DiscountAppliesTo {
+  ALL_PRODUCTS
+  SPECIFIC_PRODUCTS
+  SPECIFIC_COLLECTIONS
+}
+
+enum DiscountCustomerEligibility {
+  ALL
+  SPECIFIC_CUSTOMERS
+  SPECIFIC_SEGMENTS
+  FIRST_ORDER_ONLY
+}
+
+enum CampaignChannel {
+  EMAIL
+  SMS
+  ON_SITE
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  CANCELLED
+}
+
+enum ReviewStatus {
+  PENDING_MODERATION
+  APPROVED
+  REJECTED
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TextPosition {
+  LEFT
+  CENTER
+  RIGHT
+}
+
+enum BannerPlacement {
+  HOMEPAGE_MID
+  HOMEPAGE_TOP
+  CATEGORY_TOP
+  CART_SIDEBAR
+}
+
+enum MediaFolder {
+  PRODUCTS
+  BANNERS
+  CATEGORIES
+  REVIEWS
+  SOCIAL
+}
+
+enum SegmentType {
+  RULE_BASED
+  MANUAL
+}
+
+enum SegmentMembershipSource {
+  RULE
+  MANUAL
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum NotificationAudience {
+  CUSTOMER
+  ADMIN
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum OutboxStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
+  FAILED
+  DEAD
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum AnalyticsEventType {
+  PAGE_VIEW
+  PRODUCT_VIEW
+  PRODUCT_LIST_VIEW
+  SEARCH
+  ADD_TO_CART
+  REMOVE_FROM_CART
+  CHECKOUT_STARTED
+  CHECKOUT_COMPLETED
+}

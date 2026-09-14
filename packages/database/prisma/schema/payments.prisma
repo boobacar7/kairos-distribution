@@ -1,0 +1,136 @@
+model PaymentProviderConfig {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  displayName  String
+  isActive     Boolean  @default(false)
+  position     Int      @default(0)
+  capabilities Json
+  publicConfig Json?
+  secretRef    String?
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("payment_provider_configs")
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  orderId             String        @unique
+  providerKey         String
+  status              PaymentStatus @default(PENDING)
+  currency            String        @default("XOF")
+  amountExpected      Int
+  amountAuthorized    Int           @default(0)
+  amountCaptured      Int           @default(0)
+  amountRefunded      Int           @default(0)
+  providerPaymentId   String?
+  providerCustomerRef String?
+  failureCode         String?
+  failureMessage      String?
+  verifiedAt          DateTime?     @db.Timestamptz(6)
+  createdAt           DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime      @updatedAt @db.Timestamptz(6)
+
+  order        Order                @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  transactions PaymentTransaction[]
+  refunds      Refund[]
+
+  @@unique([providerKey, providerPaymentId])
+  @@index([status, createdAt])
+  @@index([providerKey, status])
+  @@map("payments")
+}
+
+model PaymentTransaction {
+  id                    String           @id @default(cuid())
+  paymentId             String
+  type                  PaymentTxnType
+  status                PaymentTxnStatus @default(PENDING)
+  amount                Int
+  providerTransactionId String?
+  idempotencyKey        String           @unique
+  errorCode             String?
+  errorMessage          String?
+  payloadDigest         String?
+  redactedDetail        Json?
+  processedAt           DateTime?        @db.Timestamptz(6)
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId, createdAt])
+  @@index([providerTransactionId])
+  @@index([type, status])
+  @@map("payment_transactions")
+}
+
+model PaymentWebhookEvent {
+  id              String    @id @default(cuid())
+  providerKey     String
+  providerEventId String
+  eventType       String
+  payloadDigest   String
+  redactedDetail  Json?
+  signatureValid  Boolean
+  receivedAt      DateTime  @default(now()) @db.Timestamptz(6)
+  processedAt     DateTime? @db.Timestamptz(6)
+  processingError String?
+  relatedOrderRef String?
+
+  payloadVault PaymentWebhookPayloadVault?
+
+  @@unique([providerKey, providerEventId])
+  @@index([processedAt])
+  @@index([relatedOrderRef])
+  @@map("payment_webhook_events")
+}
+
+model PaymentWebhookPayloadVault {
+  id                String   @id @default(cuid())
+  webhookEventId    String   @unique
+  providerKey       String
+  ciphertext        Bytes
+  iv                Bytes
+  authTag           Bytes
+  keyId             String
+  headersCiphertext Bytes?
+  byteSize          Int
+  expiresAt         DateTime @db.Timestamptz(6)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  webhookEvent PaymentWebhookEvent @relation(fields: [webhookEventId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([providerKey, createdAt])
+  @@map("payment_webhook_payload_vault")
+}
+
+model Refund {
+  id                    String       @id @default(cuid())
+  paymentId             String
+  orderId               String
+  amount                Int
+  taxAmount             Int          @default(0)
+  reason                String
+  status                RefundStatus @default(REQUESTED)
+  requestedByCustomerId String?
+  approvedByAdminUserId String?
+  providerRefundId      String?
+  idempotencyKey        String       @unique
+  failureMessage        String?
+  requestedAt           DateTime     @default(now()) @db.Timestamptz(6)
+  processedAt           DateTime?    @db.Timestamptz(6)
+  updatedAt             DateTime     @updatedAt @db.Timestamptz(6)
+
+  payment     Payment    @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  requestedBy Customer?  @relation("RefundRequester", fields: [requestedByCustomerId], references: [id], onDelete: SetNull)
+  approvedBy  AdminUser? @relation("RefundApprover", fields: [approvedByAdminUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([paymentId])
+  @@index([status, requestedAt])
+  @@index([requestedByCustomerId])
+  @@index([approvedByAdminUserId])
+  @@map("refunds")
+}

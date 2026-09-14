@@ -1,0 +1,43 @@
+model DeliveryZone {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  city        String?
+  region      String?
+  countryCode String   @default("BF")
+  description String?
+  isActive    Boolean  @default(true)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  methods DeliveryMethod[]
+  orders  Order[]
+
+  @@index([isActive, position])
+  @@map("delivery_zones")
+}
+
+model DeliveryMethod {
+  id                String   @id @default(cuid())
+  zoneId            String
+  code              String
+  name              String
+  description       String?
+  fee               Int
+  estimatedMinHours Int
+  estimatedMaxHours Int
+  freeAboveSubtotal Int?
+  providerKey       String?  @default("internal")
+  isActive          Boolean  @default(true)
+  position          Int      @default(0)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+
+  zone   DeliveryZone @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+  orders Order[]
+
+  @@unique([zoneId, code])
+  @@index([zoneId, isActive, position])
+  @@map("delivery_methods")
+}
