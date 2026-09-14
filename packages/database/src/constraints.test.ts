@@ -182,6 +182,32 @@ describe('integrity objects after migrate deploy', () => {
     ).rejects.toThrow(/inventory_nonneg/);
   });
 
+  it('enforces citext uniqueness on customer email under Prisma 7.10', async () => {
+    const prisma = testPrisma();
+    const local = `citext-${Date.now()}`;
+    await prisma.customer.create({
+      data: {
+        email: `Admin@${local}.Example.com`,
+        firstName: 'Case',
+        lastName: 'Fold',
+      },
+    });
+    await expect(
+      prisma.customer.create({
+        data: {
+          email: `admin@${local}.example.com`,
+          firstName: 'Case',
+          lastName: 'Fold',
+        },
+      }),
+    ).rejects.toThrow(/customers_email_key|Unique constraint/i);
+
+    const row = await prisma.customer.findUniqueOrThrow({
+      where: { email: `admin@${local}.example.com` },
+    });
+    expect(row.email.toLowerCase()).toBe(`admin@${local}.example.com`);
+  });
+
   it('rejects an INCLUSIVE order whose grandTotal adds tax', async () => {
     await expect(
       testPrisma().order.create({

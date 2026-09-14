@@ -92,6 +92,49 @@ describe('inventory concurrency', () => {
     expect(movements).toBe(0);
   });
 
+  it('still accepts an order line for an untracked variant with zero on-hand', async () => {
+    const catalog = await createTrackedVariant(testPrisma(), {
+      onHand: 0,
+      trackInventory: false,
+    });
+    const prisma = testPrisma();
+    const order = await prisma.order.create({
+      data: {
+        reference: `KD-UNTRACKED-${catalog.variantId.slice(0, 8)}`,
+        email: 'untracked@example.test',
+        phone: '+22673000000',
+        firstName: 'Un',
+        lastName: 'Tracked',
+        subtotal: 5000,
+        grandTotal: 5000,
+        deliveryZoneName: 'Ouagadougou',
+        deliveryMethodName: 'Standard',
+        deliveryFeeSnapshot: 0,
+        items: {
+          create: {
+            productId: catalog.productId,
+            variantId: catalog.variantId,
+            sku: `U-${catalog.variantId.slice(0, 8)}`,
+            productName: '[TEST] untracked',
+            variantName: 'Default',
+            productSlug: 'untracked',
+            unitPrice: 5000,
+            quantity: 1,
+            lineSubtotal: 5000,
+            lineTotal: 5000,
+            productSnapshot: { name: '[TEST] untracked' },
+          },
+        },
+      },
+      include: { items: true },
+    });
+    expect(order.items).toHaveLength(1);
+    const reservations = await prisma.stockReservation.count({
+      where: { inventoryItemId: catalog.inventoryItemId },
+    });
+    expect(reservations).toBe(0);
+  });
+
   it('runs the reservation transaction at READ COMMITTED', async () => {
     const prisma = testPrisma();
     const level = await withInventoryTransaction({ prisma }, async (tx) => {
