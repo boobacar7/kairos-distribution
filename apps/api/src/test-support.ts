@@ -1,0 +1,150 @@
+import { randomBytes } from 'node:crypto';
+
+import { TEST_DATA_NAME_PREFIX } from '@kairos/types';
+import {
+  createPrismaClient,
+  enableInventoryLedger,
+  seedReference,
+  type PrismaClient,
+} from '@kairos/database';
+import { type INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+
+import { AppModule } from './app.module.js';
+import { ApiExceptionFilter } from './common/api-exception.filter.js';
+import { GLOBAL_PREFIX_OPTIONS } from './http.js';
+
+export function suffix(): string {
+  return randomBytes(6).toString('hex');
+}
+
+let prisma: PrismaClient | undefined;
+let seeded = false;
+
+export function testPrisma(): PrismaClient {
+  prisma ??= createPrismaClient({ includeDeleted: true });
+  return prisma;
+}
+
+export async function ensureSeeded(): Promise<PrismaClient> {
+  const client = testPrisma();
+  if (!seeded) {
+    await seedReference(client);
+    seeded = true;
+  }
+  return client;
+}
+
+export async function createCatalogApp(): Promise<INestApplication> {
+  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  const app = moduleRef.createNestApplication();
+  app.setGlobalPrefix('v1', GLOBAL_PREFIX_OPTIONS);
+  app.useGlobalFilters(new ApiExceptionFilter());
+  await app.init();
+  return app;
+}
+
+export type CreatedProduct = {
+  id: string;
+  slug: string;
+  variantId: string;
+  sku: string;
+  name: string;
+  categorySlug: string;
+};
+
+export async function createPublicProduct(
+  client: PrismaClient,
+  options: {
+    name?: string;
+    slug?: string;
+    categorySlug?: string;
+    status?: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
+    price?: number;
+    sku?: string;
+    inventory?: 'tracked' | 'untracked' | 'missing';
+    onHand?: number;
+    description?: string | null;
+    benefits?: string | null;
+    ingredients?: string | null;
+    usage?: string | null;
+    precautions?: string | null;
+    publishedAt?: Date | null;
+  } = {},
+): Promise<CreatedProduct> {
+  const id = suffix();
+  const categorySlug = options.categorySlug ?? 'beaute-soins';
+  const category = await client.category.findUniqueOrThrow({ where: { slug: categorySlug } });
+  const price = options.price ?? 5000;
+  const name = options.name ?? `${TEST_DATA_NAME_PREFIX} product ${id}`;
+  const slug = options.slug ?? `test-product-${id}`;
+  const sku = options.sku ?? `TEST-SKU-${id}`;
+  const publishedAt =
+    options.publishedAt === undefined
+      ? options.status === 'DRAFT'
+        ? null
+        : new Date()
+      : options.publishedAt;
+
+  const product = await client.product.create({
+    data: {
+      name,
+      slug,
+      categoryId: category.id,
+      status: options.status ?? 'ACTIVE',
+      description: options.description ?? null,
+      benefits: options.benefits ?? null,
+      ingredients: options.ingredients ?? null,
+      usage: options.usage ?? null,
+      precautions: options.precautions ?? null,
+      minPrice: price,
+      maxPrice: price,
+      publishedAt,
+    },
+  });
+
+  const variant = await client.productVariant.create({
+    data: {
+      productId: product.id,
+      name: 'Default',
+      sku,
+      price,
+      cost: 42,
+      isDefault: true,
+    },
+  });
+
+  const inventory = options.inventory ?? 'tracked';
+  if (inventory !== 'missing') {
+    const trackInventory = inventory === 'tracked';
+    const onHand = options.onHand ?? (trackInventory ? 3 : 0);
+    await client.$transaction(async (tx) => {
+      await enableInventoryLedger(tx);
+      await tx.inventoryItem.create({
+        data: {
+          variantId: variant.id,
+          trackInventory,
+          onHandQty: onHand,
+          reservedQty: 0,
+          availableQty: onHand,
+          isOutOfStock: trackInventory && onHand <= 0,
+          isLowStock: trackInventory && onHand <= 5,
+          lowStockThreshold: 5,
+        },
+      });
+    });
+  }
+
+  return {
+    id: product.id,
+    slug,
+    variantId: variant.id,
+    sku,
+    name,
+    categorySlug,
+  };
+}
+
+export async function deleteProduct(client: PrismaClient, productId: string): Promise<void> {
+  await client.product.delete({ where: { id: productId } }).catch(() => undefined);
+}

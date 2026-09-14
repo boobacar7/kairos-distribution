@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { EnvironmentValidationError, isProduction, parseEnv, parseStorefrontEnv } from './index.js';
+import {
+  EnvironmentValidationError,
+  isProduction,
+  parseApiEnv,
+  parseEnv,
+  parseStorefrontEnv,
+} from './index.js';
 
 const validEnv = {
   DATABASE_URL: 'postgresql://kairos:kairos@localhost:5432/kairos_dev?schema=public',
@@ -74,5 +80,19 @@ describe('parseStorefrontEnv', () => {
     expect(
       parseStorefrontEnv({ STOREFRONT_USE_TEST_CATALOGUE: 'false' }).STOREFRONT_USE_TEST_CATALOGUE,
     ).toBe(false);
+  });
+});
+
+describe('parseApiEnv', () => {
+  it('requires DATABASE_URL and defaults the listen port', () => {
+    const env = parseApiEnv(validEnv);
+    expect(env.PORT).toBe(4000);
+    expect(env.DATABASE_URL).toContain('postgresql://');
+  });
+
+  it('rejects a malformed CORS origin', () => {
+    expect(() => parseApiEnv({ ...validEnv, CORS_ORIGIN: 'not-a-url' })).toThrow(
+      EnvironmentValidationError,
+    );
   });
 });

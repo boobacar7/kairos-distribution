@@ -56,6 +56,17 @@ export const storefrontEnvSchema = baseEnvSchema.extend({
 
 export type StorefrontEnv = z.infer<typeof storefrontEnvSchema>;
 
+/**
+ * API process env. Requires DATABASE_URL (Prisma is API-only) plus the HTTP bind port.
+ * `CORS_ORIGIN` is the storefront origin when the browser calls the API directly.
+ */
+export const apiEnvSchema = envSchema.extend({
+  PORT: z.coerce.number().int().positive().max(65535).default(4000),
+  CORS_ORIGIN: z.string().url().optional(),
+});
+
+export type ApiEnv = z.infer<typeof apiEnvSchema>;
+
 export class EnvironmentValidationError extends Error {
   public readonly issues: readonly string[];
 
@@ -79,11 +90,7 @@ export function parseEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const result = envSchema.safeParse(source);
 
   if (!result.success) {
-    const issues = result.error.issues.map((issue) => {
-      const path = issue.path.join('.');
-      return path.length > 0 ? `${path}: ${issue.message}` : issue.message;
-    });
-    throw new EnvironmentValidationError(issues);
+    throw new EnvironmentValidationError(formatIssues(result.error.issues));
   }
 
   return result.data;
@@ -93,14 +100,27 @@ export function parseStorefrontEnv(source: NodeJS.ProcessEnv = process.env): Sto
   const result = storefrontEnvSchema.safeParse(source);
 
   if (!result.success) {
-    const issues = result.error.issues.map((issue) => {
-      const path = issue.path.join('.');
-      return path.length > 0 ? `${path}: ${issue.message}` : issue.message;
-    });
-    throw new EnvironmentValidationError(issues);
+    throw new EnvironmentValidationError(formatIssues(result.error.issues));
   }
 
   return result.data;
+}
+
+export function parseApiEnv(source: NodeJS.ProcessEnv = process.env): ApiEnv {
+  const result = apiEnvSchema.safeParse(source);
+
+  if (!result.success) {
+    throw new EnvironmentValidationError(formatIssues(result.error.issues));
+  }
+
+  return result.data;
+}
+
+function formatIssues(issues: readonly { path: PropertyKey[]; message: string }[]): string[] {
+  return issues.map((issue) => {
+    const path = issue.path.join('.');
+    return path.length > 0 ? `${path}: ${issue.message}` : issue.message;
+  });
 }
 
 export function isProduction(env: Pick<Env, 'NODE_ENV'>): boolean {
