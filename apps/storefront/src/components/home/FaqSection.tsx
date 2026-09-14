@@ -3,10 +3,10 @@
 import { EmptyState } from '@kairos/ui';
 import { useState } from 'react';
 
-import type { FaqItem } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { Accordion } from '../../ui/interactive.js';
-import { HomeSection } from './HomeSection.js';
+import type { FaqItem } from '../../content/contract';
+import { t } from '../../messages/t';
+import { Accordion } from '../../ui/interactive';
+import { HomeSection } from './HomeSection';
 
 export function FaqSection({ items }: { items: readonly FaqItem[] }) {
   const [openId, setOpenId] = useState<string | null>(items[0]?.id ?? null);
@@ -14,7 +14,7 @@ export function FaqSection({ items }: { items: readonly FaqItem[] }) {
   return (
     <HomeSection id="faq" title={t('home.faq')}>
       {items.length === 0 ? (
-        <EmptyState title={t('home.faq')}>{t('empty.faq')}</EmptyState>
+        <EmptyState title={t('empty.faq')} />
       ) : (
         <Accordion
           items={items.map((item) => ({

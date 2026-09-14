@@ -1,7 +1,7 @@
 import { CATEGORY_SEEDS, TEST_DATA_NAME_PREFIX } from '@kairos/types';
 import { money } from '@kairos/types/money';
 
-import type { CategoryCard, FeaturedProduct, HomeContent } from './contract.js';
+import type { CategoryCard, FeaturedProduct, HomeContent } from './contract';
 
 function emptyHome(): HomeContent {
   return {

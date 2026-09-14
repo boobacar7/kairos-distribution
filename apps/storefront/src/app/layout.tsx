@@ -2,14 +2,13 @@ import { SkipLink } from '@kairos/ui';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { MobileBottomNav } from '../components/shell/MobileBottomNav.js';
-import { StorefrontFooter } from '../components/shell/StorefrontFooter.js';
-import { StorefrontHeader } from '../components/shell/StorefrontHeader.js';
-import { HOME_REVALIDATE_SECONDS, loadHomeContent } from '../content/load-home.js';
-import { t } from '../messages/t.js';
+import { MobileBottomNav } from '../components/shell/MobileBottomNav';
+import { StorefrontFooter } from '../components/shell/StorefrontFooter';
+import { StorefrontHeader } from '../components/shell/StorefrontHeader';
+import type { FooterContent } from '../content/contract';
+import { loadHomeContent } from '../content/load-home';
+import { t } from '../messages/t';
 import './globals.css';
-
-export const revalidate = HOME_REVALIDATE_SECONDS;
 
 export const metadata: Metadata = {
   title: {
@@ -20,11 +19,11 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  let footer = { sections: [], social: [] };
+  let footer: FooterContent = { sections: [], social: [] };
   try {
     footer = (await loadHomeContent()).footer;
   } catch {
-    footer = { sections: [], social: [] };
+    // Layout still renders when the CMS payload is unavailable; the page error boundary handles it.
   }
 
   return (

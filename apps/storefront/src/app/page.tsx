@@ -1,8 +1,8 @@
-import { HomeView } from '../components/home/HomeView.js';
-import { HOME_REVALIDATE_SECONDS, loadHomeContent } from '../content/load-home.js';
-import { t } from '../messages/t.js';
+import { HomeView } from '../components/home/HomeView';
+import { loadHomeContent } from '../content/load-home';
+import { t } from '../messages/t';
 
-export const revalidate = HOME_REVALIDATE_SECONDS;
+export const revalidate = 300;
 
 export default async function HomePage() {
   const content = await loadHomeContent();

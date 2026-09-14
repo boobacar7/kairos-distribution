@@ -1,14 +1,14 @@
 import { Card, CardBody, CardMedia, CardTitle, EmptyState } from '@kairos/ui';
 
-import type { CategoryCard } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { HomeSection } from './HomeSection.js';
+import type { CategoryCard } from '../../content/contract';
+import { t } from '../../messages/t';
+import { HomeSection } from './HomeSection';
 
 export function CategoriesSection({ categories }: { categories: readonly CategoryCard[] }) {
   return (
     <HomeSection id="categories" title={t('home.categories')}>
       {categories.length === 0 ? (
-        <EmptyState title={t('home.categories')}>{t('empty.categories')}</EmptyState>
+        <EmptyState title={t('empty.categories')} />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (

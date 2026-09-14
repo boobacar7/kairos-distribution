@@ -10,10 +10,6 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: repoRoot,
   reactStrictMode: true,
   transpilePackages: ['@kairos/ui', '@kairos/config', '@kairos/types', '@kairos/validation'],
-  typedRoutes: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;

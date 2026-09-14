@@ -2,7 +2,7 @@
 
 import { Alert, Button } from '@kairos/ui';
 
-import { t } from '../messages/t.js';
+import { t } from '../messages/t';
 
 export default function HomeError({
   reset,

@@ -1,9 +1,9 @@
 import { EmptyState } from '@kairos/ui';
 
-import type { HeroSlide } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { Carousel } from '../../ui/interactive.js';
-import { HeroPicture } from './HeroPicture.js';
+import type { HeroSlide } from '../../content/contract';
+import { t } from '../../messages/t';
+import { Carousel } from '../../ui/interactive';
+import { HeroPicture } from './HeroPicture';
 
 const TEXT_POSITION = {
   LEFT: 'left',
@@ -16,7 +16,7 @@ export function HeroSection({ slides }: { slides: readonly HeroSlide[] }) {
     return (
       <section aria-label={t('home.hero')} className="px-gutter py-section md:px-gutter-lg">
         <div className="mx-auto max-w-7xl">
-          <EmptyState title={t('home.hero')}>{t('empty.hero')}</EmptyState>
+          <EmptyState title={t('empty.hero')} />
         </div>
       </section>
     );

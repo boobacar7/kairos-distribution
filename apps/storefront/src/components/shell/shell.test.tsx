@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { t } from '../../messages/t.js';
-import { StorefrontHeader } from './StorefrontHeader.js';
-import { MobileBottomNav } from './MobileBottomNav.js';
-import { CartIcon } from './CartIcon.js';
+import { t } from '../../messages/t';
+import { StorefrontHeader } from './StorefrontHeader';
+import { MobileBottomNav } from './MobileBottomNav';
+import { CartIcon } from './CartIcon';
 
 describe('storefront shell', () => {
   it('exposes desktop nav labels from the French dictionary', () => {

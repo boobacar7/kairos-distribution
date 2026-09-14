@@ -1,16 +1,16 @@
 import type { HomepageSectionKey } from '@kairos/types';
 import type { ReactNode } from 'react';
 
-import type { HomeContent } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { CategoriesSection } from './CategoriesSection.js';
-import { FaqSection } from './FaqSection.js';
-import { HeroSection } from './HeroSection.js';
-import { ProductGrid } from './ProductGrid.js';
-import { PromoSection } from './PromoSection.js';
-import { ReviewsSection } from './ReviewsSection.js';
-import { TestimonialsSection } from './TestimonialsSection.js';
-import { TrustBar } from './TrustBar.js';
+import type { HomeContent } from '../../content/contract';
+import { t } from '../../messages/t';
+import { CategoriesSection } from './CategoriesSection';
+import { FaqSection } from './FaqSection';
+import { HeroSection } from './HeroSection';
+import { ProductGrid } from './ProductGrid';
+import { PromoSection } from './PromoSection';
+import { ReviewsSection } from './ReviewsSection';
+import { TestimonialsSection } from './TestimonialsSection';
+import { TrustBar } from './TrustBar';
 
 const SECTION_TITLE: Record<HomepageSectionKey, ReturnType<typeof t>> = {
   HERO: t('home.hero'),

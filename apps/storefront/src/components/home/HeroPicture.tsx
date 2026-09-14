@@ -1,4 +1,4 @@
-import type { MediaRef } from '../../content/contract.js';
+import type { MediaRef } from '../../content/contract';
 
 /**
  * Hero art direction: separate desktop / mobile assets (spec §6).

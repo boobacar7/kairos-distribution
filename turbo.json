@@ -41,7 +41,7 @@
         "prisma.config.ts",
         "next.config.*"
       ],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**"]
     },
     "test": {
       "dependsOn": ["^build"],

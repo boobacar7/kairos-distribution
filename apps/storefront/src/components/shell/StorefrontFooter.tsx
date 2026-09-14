@@ -1,7 +1,7 @@
 import { Footer } from '@kairos/ui';
 
-import type { FooterContent } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
+import type { FooterContent } from '../../content/contract';
+import { t } from '../../messages/t';
 
 const LEGAL = [
   { href: '/livraison', key: 'footer.delivery' as const },

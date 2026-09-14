@@ -1,4 +1,4 @@
-import { messages, type MessageKey } from './fr.js';
+import { messages, type MessageKey } from './fr';
 
 export type { MessageKey };
 

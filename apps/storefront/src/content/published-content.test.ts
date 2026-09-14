@@ -2,9 +2,9 @@ import { HOMEPAGE_SECTION_KEYS } from '@kairos/types';
 import { money } from '@kairos/types/money';
 import { describe, expect, it } from 'vitest';
 
-import { parseHomePayload, type HomeContent } from './contract.js';
-import { isInSchedule, publishedHome } from './published-content.js';
-import { buildStubHome } from './stub.js';
+import { parseHomePayload, type HomeContent } from './contract';
+import { isInSchedule, publishedHome } from './published-content';
+import { buildStubHome } from './stub';
 
 const now = new Date('2026-09-14T12:00:00.000Z');
 

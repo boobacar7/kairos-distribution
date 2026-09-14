@@ -1,14 +1,14 @@
 import { EmptyState } from '@kairos/ui';
 
-import type { PromoBanner } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { HomeSection } from './HomeSection.js';
+import type { PromoBanner } from '../../content/contract';
+import { t } from '../../messages/t';
+import { HomeSection } from './HomeSection';
 
 export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
   return (
     <HomeSection id="offres" title={t('home.promo')}>
       {banners.length === 0 ? (
-        <EmptyState title={t('home.promo')}>{t('empty.promo')}</EmptyState>
+        <EmptyState title={t('empty.promo')} />
       ) : (
         <ul className="grid gap-4">
           {banners.map((banner) => (

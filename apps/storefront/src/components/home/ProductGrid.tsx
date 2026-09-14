@@ -2,9 +2,9 @@ import { Badge, EmptyState, ProductCard } from '@kairos/ui';
 import { isTestDataName } from '@kairos/types';
 import { money } from '@kairos/types/money';
 
-import type { FeaturedProduct } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { HomeSection } from './HomeSection.js';
+import type { FeaturedProduct } from '../../content/contract';
+import { t } from '../../messages/t';
+import { HomeSection } from './HomeSection';
 
 export function ProductGrid({
   id,
@@ -18,7 +18,7 @@ export function ProductGrid({
   return (
     <HomeSection id={id} title={title}>
       {products.length === 0 ? (
-        <EmptyState title={title}>{t('empty.products')}</EmptyState>
+        <EmptyState title={t('empty.products')} />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => {

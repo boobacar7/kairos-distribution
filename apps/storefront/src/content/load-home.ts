@@ -4,9 +4,9 @@ import { cache } from 'react';
 
 import { parseStorefrontEnv } from '@kairos/config';
 
-import { parseHomePayload, type HomeContent } from './contract.js';
-import { publishedHome } from './published-content.js';
-import { buildStubHome } from './stub.js';
+import { parseHomePayload, type HomeContent } from './contract';
+import { publishedHome } from './published-content';
+import { buildStubHome } from './stub';
 
 export const HOME_REVALIDATE_SECONDS = 300;
 

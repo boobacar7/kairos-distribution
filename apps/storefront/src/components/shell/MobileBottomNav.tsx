@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 
-import { t } from '../../messages/t.js';
-import { AccountGlyph, CartGlyph, HomeGlyph, ShopGlyph } from './icons.js';
+import { t } from '../../messages/t';
+import { AccountGlyph, CartGlyph, HomeGlyph, ShopGlyph } from './icons';
 
 const ITEMS = [
   { href: '/', key: 'nav.home' as const, icon: HomeGlyph },

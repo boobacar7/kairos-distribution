@@ -1,5 +1,5 @@
-import { t } from '../../messages/t.js';
-import { CartGlyph } from './icons.js';
+import { t } from '../../messages/t';
+import { CartGlyph } from './icons';
 
 export function CartIcon({ count = 0 }: { count?: number }) {
   const label = count > 0 ? t('cart.count', { count }) : t('cart.icon');

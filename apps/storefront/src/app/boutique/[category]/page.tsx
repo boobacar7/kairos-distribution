@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { PlaceholderPage, placeholderMetadata } from '../../../components/shell/PlaceholderPage.js';
+import { PlaceholderPage, placeholderMetadata } from '../../../components/shell/PlaceholderPage';
 
 export const metadata: Metadata = placeholderMetadata('pages.category.title');
 

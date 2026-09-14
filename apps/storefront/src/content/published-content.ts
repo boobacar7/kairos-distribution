@@ -5,7 +5,7 @@ import {
   type FooterContent,
   type HomeContent,
   type HomepageSection,
-} from './contract.js';
+} from './contract';
 
 export function isInSchedule(
   now: Date,

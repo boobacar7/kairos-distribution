@@ -24,6 +24,12 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
+if (typeof HTMLCanvasElement !== 'undefined') {
+  HTMLCanvasElement.prototype.getContext = function getContext() {
+    return null;
+  } as typeof HTMLCanvasElement.prototype.getContext;
+}
+
 if (typeof HTMLDialogElement !== 'undefined') {
   const proto = HTMLDialogElement.prototype;
   if (!proto.showModal) {

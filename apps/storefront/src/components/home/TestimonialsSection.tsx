@@ -1,14 +1,14 @@
 import { Card, CardBody, EmptyState, RatingStars } from '@kairos/ui';
 
-import type { Testimonial } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { HomeSection } from './HomeSection.js';
+import type { Testimonial } from '../../content/contract';
+import { t } from '../../messages/t';
+import { HomeSection } from './HomeSection';
 
 export function TestimonialsSection({ testimonials }: { testimonials: readonly Testimonial[] }) {
   return (
     <HomeSection id="temoignages" title={t('home.testimonials')}>
       {testimonials.length === 0 ? (
-        <EmptyState title={t('home.testimonials')}>{t('empty.testimonials')}</EmptyState>
+        <EmptyState title={t('empty.testimonials')} />
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
           {testimonials.map((item) => (

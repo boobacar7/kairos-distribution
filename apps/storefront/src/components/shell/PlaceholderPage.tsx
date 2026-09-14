@@ -2,7 +2,7 @@ import { EmptyState } from '@kairos/ui';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { t, type MessageKey } from '../../messages/t.js';
+import { t, type MessageKey } from '../../messages/t';
 
 export function PlaceholderPage({
   titleKey,

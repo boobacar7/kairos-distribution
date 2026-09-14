@@ -4,10 +4,10 @@ import { NavItem, TopNav } from '@kairos/ui';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-import { t } from '../../messages/t.js';
-import { Sheet } from '../../ui/interactive.js';
-import { CartIcon } from './CartIcon.js';
-import { MenuGlyph } from './icons.js';
+import { t } from '../../messages/t';
+import { Sheet } from '../../ui/interactive';
+import { CartIcon } from './CartIcon';
+import { MenuGlyph } from './icons';
 
 const DESKTOP_NAV = [
   { href: '/', key: 'nav.home' as const },

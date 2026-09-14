@@ -1,6 +1,6 @@
 import { Skeleton } from '@kairos/ui';
 
-import { t } from '../../messages/t.js';
+import { t } from '../../messages/t';
 
 export function HomeLoading() {
   return (

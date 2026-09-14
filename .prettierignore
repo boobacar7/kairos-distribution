@@ -8,3 +8,4 @@ pnpm-lock.yaml
 *.tsbuildinfo
 packages/database/generated
 packages/database/src/generated
+apps/storefront/next-env.d.ts

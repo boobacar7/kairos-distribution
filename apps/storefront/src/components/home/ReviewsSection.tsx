@@ -1,14 +1,14 @@
 import { Badge, Card, CardBody, EmptyState, RatingStars } from '@kairos/ui';
 
-import type { VerifiedReview } from '../../content/contract.js';
-import { t } from '../../messages/t.js';
-import { HomeSection } from './HomeSection.js';
+import type { VerifiedReview } from '../../content/contract';
+import { t } from '../../messages/t';
+import { HomeSection } from './HomeSection';
 
 export function ReviewsSection({ reviews }: { reviews: readonly VerifiedReview[] }) {
   return (
     <HomeSection id="avis" title={t('home.reviews')}>
       {reviews.length === 0 ? (
-        <EmptyState title={t('home.reviews')}>{t('empty.reviews')}</EmptyState>
+        <EmptyState title={t('empty.reviews')} />
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
           {reviews.map((review) => (

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { t } from './t.js';
+import { t } from './t';
 
 describe('t', () => {
   it('returns French chrome copy for a known key', () => {
