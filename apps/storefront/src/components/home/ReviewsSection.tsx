@@ -22,14 +22,18 @@ export function ReviewsSection({
       count: summary.reviewCount,
     });
     return (
-      <section id="avis" aria-labelledby="avis-titre" className="px-gutter py-2 md:px-gutter-lg">
-        <div className="border-beige mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 rounded-xl border bg-ivory px-3 py-2 shadow-soft md:flex md:items-center md:justify-between md:gap-4 md:px-8 md:py-3">
+      <section
+        id="avis"
+        aria-labelledby="avis-titre"
+        className="px-gutter py-1 md:px-gutter-lg md:py-2"
+      >
+        <div className="border-beige mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0.5 rounded-xl border bg-ivory px-3 py-1.5 shadow-soft md:flex md:items-center md:justify-between md:gap-4 md:px-8 md:py-3">
           <div className="min-w-0">
             <h2 id="avis-titre" className="text-botanical text-body font-semibold">
               {summary.headline}
             </h2>
             {summary.supporting ? (
-              <p className="text-botanical/80 max-w-xs truncate text-caption">
+              <p className="text-botanical/80 max-w-xs text-caption leading-tight">
                 {summary.supporting}
               </p>
             ) : null}
@@ -42,7 +46,7 @@ export function ReviewsSection({
             />
             <p className="text-botanical text-caption">{averageLabel}</p>
           </div>
-          <div className="col-span-2 flex items-center justify-end gap-2 md:col-span-1 md:gap-3">
+          <div className="col-span-2 flex items-center justify-end gap-2 md:col-auto md:gap-3">
             {summary.avatars.map((avatar) =>
               avatar.url ? (
                 <img

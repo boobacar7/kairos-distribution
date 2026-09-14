@@ -25,7 +25,7 @@ export function CategoriesSection({ categories }: { categories: readonly Categor
   }
 
   return (
-    <section aria-label={t('home.categories')} className="px-gutter py-2.5 md:px-gutter-lg md:py-4">
+    <section aria-label={t('home.categories')} className="px-gutter py-2 md:px-gutter-lg md:py-4">
       <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-1.5 md:gap-8">
         {categories.map((category) => {
           const visual = ICON_BY_SLUG[category.slug] ?? {

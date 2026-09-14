@@ -122,10 +122,15 @@ export function CupGlyph({ className }: { className?: string }) {
 
 export function CapsuleGlyph({ className }: { className?: string }) {
   return (
-    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.9}>
-      <rect x="7.2" y="3.8" width="9.6" height="16.4" rx="4.8" transform="rotate(45 12 12)" />
-      <path d="m8.2 13.8 5.6-5.6" strokeWidth="2.2" />
-      <path d="M9.1 15.2c1.6 1.6 4.1 1.6 5.7 0" fill="currentColor" stroke="none" />
+    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.7}>
+      <path d="M8.2 15.8a4.2 4.2 0 0 1 0-5.9l5.7-5.7a4.2 4.2 0 1 1 5.9 5.9l-5.7 5.7a4.2 4.2 0 0 1-5.9 0Z" />
+      <path d="m9.6 14.4 5.9-5.9" />
+      <path
+        d="M8.8 12.2c.6 2 2.6 3.4 4.8 3.2"
+        fill="currentColor"
+        fillOpacity="0.35"
+        stroke="none"
+      />
     </Icon>
   );
 }

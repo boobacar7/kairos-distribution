@@ -89,21 +89,21 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         alt={product.image.alt}
                         width={product.image.width ?? 160}
                         height={product.image.height ?? 160}
-                        className="h-[4.5rem] w-full rounded-lg object-cover md:h-[6.75rem] md:w-[6.75rem]"
+                        className="h-16 w-full rounded-lg object-cover md:h-[7.25rem] md:w-[7.25rem]"
                         loading="lazy"
                       />
                     ) : (
-                      <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[6.75rem] md:w-[6.75rem]" />
+                      <span className="bg-soft-green block h-16 w-full rounded-lg md:h-[7.25rem] md:w-[7.25rem]" />
                     )}
                   </a>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
-                        <h3 className="text-botanical line-clamp-2 text-caption leading-tight font-semibold md:text-body-sm">
+                        <h3 className="text-botanical text-caption leading-tight font-semibold md:text-body-sm">
                           {product.name}
                         </h3>
                         {product.subtitle ? (
-                          <p className="text-botanical/70 truncate text-caption leading-tight">
+                          <p className="text-botanical/70 text-caption leading-tight">
                             {product.subtitle}
                           </p>
                         ) : null}
@@ -121,7 +121,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       </p>
                     ) : null}
                     <div className="mt-1 flex items-center gap-1">
-                      <p className="text-botanical min-w-0 text-caption leading-tight font-semibold md:text-body-sm">
+                      <p className="text-botanical min-w-0 text-caption leading-tight font-semibold whitespace-nowrap md:text-body-sm">
                         {formatPrice(product.price)}
                       </p>
                       <a
