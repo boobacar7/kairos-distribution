@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx } from '../lib/cx.js';
 import { Spinner } from './VisuallyHidden.js';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse' | 'cta';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const VARIANT: Record<ButtonVariant, string> = {
@@ -13,6 +13,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent text-botanical hover:bg-soft-green disabled:text-botanical/40',
   destructive: 'bg-coral text-ink hover:bg-coral/90 disabled:bg-coral/40',
   inverse: 'bg-ivory text-botanical hover:bg-soft-green disabled:bg-ivory/40',
+  cta: 'bg-coral text-ink hover:bg-coral/90 disabled:bg-coral/40',
 };
 
 const SIZE: Record<ButtonSize, string> = {
@@ -52,6 +53,7 @@ export function Button({
       aria-busy={loading || undefined}
       aria-disabled={isDisabled || undefined}
       data-variant={variant}
+      data-cta={variant === 'cta' ? '' : undefined}
       className={cx(
         'font-sans inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors',
         'disabled:cursor-not-allowed',

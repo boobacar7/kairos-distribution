@@ -35,7 +35,7 @@ export const PALETTE_CSS_NAMES: Record<PaletteName, string> = {
 
 export const PALETTE_HEXES: readonly PaletteHex[] = Object.values(PALETTE);
 
-/** Spec §3 interface type. Elegant headings use the serif. */
+/** Spec §3. Bob approved Manrope (interface) and DM Serif Display (headings). */
 export const TYPEFACES = {
   sans: 'Manrope',
   sansVariable: 'Manrope Variable',

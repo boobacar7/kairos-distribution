@@ -50,7 +50,11 @@ describe('Carousel', () => {
         playLabel="[TEST] Play"
         slideLabel={(page, total) => `[TEST] Slide ${page} of ${total}`}
         slides={[
-          { id: 'a', title: '[TEST] First' },
+          {
+            id: 'a',
+            title: '[TEST] First',
+            cta: { label: '[TEST] Shop', href: '#shop' },
+          },
           { id: 'b', title: '[TEST] Second' },
         ]}
       />,
@@ -64,5 +68,30 @@ describe('Carousel', () => {
     expect(
       screen.getByRole('button', { name: playing ? '[TEST] Play' : '[TEST] Pause' }),
     ).toBeInTheDocument();
+  });
+
+  it('paints the hero CTA coral with ink text, not ivory on coral', () => {
+    render(
+      <Carousel
+        label="[TEST] Hero"
+        previousLabel="[TEST] Previous"
+        nextLabel="[TEST] Next"
+        pauseLabel="[TEST] Pause"
+        playLabel="[TEST] Play"
+        slideLabel={(page, total) => `[TEST] Slide ${page} of ${total}`}
+        slides={[
+          {
+            id: 'a',
+            title: '[TEST] First',
+            cta: { label: '[TEST] Shop', href: '#shop' },
+          },
+        ]}
+      />,
+    );
+    const cta = screen.getByRole('link', { name: '[TEST] Shop' });
+    expect(cta).toHaveAttribute('data-cta');
+    expect(cta.className).toContain('bg-coral');
+    expect(cta.className).toContain('text-ink');
+    expect(cta.className).not.toContain('text-ivory');
   });
 });

@@ -122,7 +122,8 @@ export function Carousel({
             {current.cta ? (
               <a
                 href={current.cta.href}
-                className="bg-ivory text-botanical inline-flex min-h-11 items-center rounded-md px-4 font-semibold"
+                data-cta=""
+                className="bg-coral text-ink inline-flex min-h-11 items-center rounded-md px-4 font-semibold hover:bg-coral/90"
               >
                 {current.cta.label}
               </a>

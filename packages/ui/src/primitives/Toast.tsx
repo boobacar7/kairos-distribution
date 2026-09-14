@@ -7,7 +7,7 @@ export type ToastTone = 'info' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<ToastTone, string> = {
   info: 'bg-soft-green text-ink border-botanical',
-  success: 'bg-soft-green text-ink border-botanical',
+  success: 'bg-soft-green text-botanical border-botanical',
   warning: 'bg-beige text-ink border-beige',
   danger: 'bg-coral text-ink border-coral',
 };

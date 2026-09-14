@@ -131,6 +131,7 @@ export function Gallery() {
               <Button>[TEST] Primaire</Button>
               <Button variant="secondary">[TEST] Secondaire</Button>
               <Button variant="ghost">[TEST] Ghost</Button>
+              <Button variant="cta">[TEST] CTA</Button>
               <Button variant="destructive">[TEST] Destructeur</Button>
               <Button loading loadingLabel="[TEST] Chargement">
                 [TEST] Chargement
