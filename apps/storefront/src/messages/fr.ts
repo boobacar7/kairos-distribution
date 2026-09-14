@@ -101,6 +101,8 @@ export const messages = {
   'catalog.unavailable': 'Ce produit ne peut pas être ajouté pour le moment.',
   'catalog.inventoryError':
     'La disponibilité de ce produit ne peut pas être confirmée. Il n’est pas marqué en rupture de stock.',
+  'catalog.inconsistent':
+    'Ce produit est dans un état catalogue incohérent et n’est pas proposé à la vente.',
   'catalog.viewProduct': 'Voir {name}',
 
   'errors.title': 'Une erreur est survenue',

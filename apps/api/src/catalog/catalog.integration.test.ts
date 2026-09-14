@@ -90,26 +90,41 @@ describe('catalog API', () => {
 
     const all = await request(app.getHttpServer())
       .get('/v1/products')
-      .query({ q: '[TEST]', sort: 'price_asc' })
+      .query({ q: '[TEST]', sort: 'price_asc', limit: 100 })
       .expect(200);
 
     const body = all.body as {
       data: Array<{
         name: string;
         slug: string;
-        price: number;
-        variantId: string;
+        price: number | null;
+        variantId: string | null;
         availability: { status: string };
         cost?: unknown;
       }>;
       meta: { total: number };
     };
     expect(JSON.stringify(body)).not.toMatch(/"cost"/);
-    const names = body.data.map((row) => row.name);
-    expect(names).toContain(tracked.name);
-    expect(names).toContain(cheap.name);
-    expect(names.some((name) => name.includes('Draft'))).toBe(false);
-    expect(body.data[0]?.price).toBeLessThanOrEqual(body.data[body.data.length - 1]?.price ?? 0);
+    expect(body.data.some((row) => row.name.includes('Draft'))).toBe(false);
+    const priced = body.data
+      .map((row) => row.price)
+      .filter((price): price is number => price != null);
+    expect(priced[0]).toBeLessThanOrEqual(priced[priced.length - 1] ?? 0);
+
+    const trackedHit = await request(app.getHttpServer())
+      .get('/v1/products')
+      .query({ q: tracked.sku })
+      .expect(200);
+    expect(trackedHit.body.data).toEqual(
+      expect.arrayContaining([expect.objectContaining({ slug: tracked.slug, name: tracked.name })]),
+    );
+    const cheapHit = await request(app.getHttpServer())
+      .get('/v1/products')
+      .query({ q: cheap.sku })
+      .expect(200);
+    expect(cheapHit.body.data).toEqual(
+      expect.arrayContaining([expect.objectContaining({ slug: cheap.slug, name: cheap.name })]),
+    );
 
     const search = await request(app.getHttpServer())
       .get('/v1/products')
@@ -206,6 +221,64 @@ describe('catalog API', () => {
     expect(outSlugs).toContain(out.slug);
     expect(outSlugs).not.toContain(missing.slug);
     expect(outSlugs).not.toContain(untracked.slug);
+  });
+
+  it('includes ACTIVE products with no default variant as a catalog inconsistency instead of omitting them', async () => {
+    const broken = await addProduct(testPrisma(), {
+      name: '[TEST] No default variant',
+      slug: `test-no-default-${Date.now()}`,
+      variants: 'none',
+    });
+    const healthy = await addProduct(testPrisma(), {
+      name: '[TEST] Has default variant',
+      slug: `test-has-default-${Date.now()}`,
+      inventory: 'tracked',
+      onHand: 2,
+    });
+
+    const list = await request(app.getHttpServer())
+      .get('/v1/products')
+      .query({ q: '[TEST]' })
+      .expect(200);
+    const rows = list.body.data as Array<{
+      slug: string;
+      price: number | null;
+      sku: string | null;
+      variantId: string | null;
+      availability: { status: string; purchasable: boolean; issue: string | null };
+    }>;
+    const brokenRow = rows.find((row) => row.slug === broken.slug);
+    expect(brokenRow).toEqual(
+      expect.objectContaining({
+        slug: broken.slug,
+        price: null,
+        sku: null,
+        variantId: null,
+        availability: {
+          status: 'UNKNOWN',
+          purchasable: false,
+          issue: 'MISSING_DEFAULT_VARIANT',
+        },
+      }),
+    );
+    expect(rows.some((row) => row.slug === healthy.slug)).toBe(true);
+
+    const detail = await request(app.getHttpServer())
+      .get(`/v1/products/${broken.slug}`)
+      .expect(200);
+    expect(detail.body.data).toEqual(
+      expect.objectContaining({
+        slug: broken.slug,
+        price: null,
+        sku: null,
+        variantId: null,
+        availability: {
+          status: 'UNKNOWN',
+          purchasable: false,
+          issue: 'MISSING_DEFAULT_VARIANT',
+        },
+      }),
+    );
   });
 
   it('returns a flattened single-variant PDP and omits empty narrative fields', async () => {

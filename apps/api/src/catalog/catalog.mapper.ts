@@ -9,7 +9,6 @@ import type {
   CatalogVariant,
 } from '@kairos/validation/catalog';
 
-import { CatalogInconsistentError } from './catalog.errors.js';
 import { classifyAvailability } from './domain/availability.js';
 
 export type InventoryRow = {
@@ -122,13 +121,14 @@ function activeVariants(product: ProductRow): VariantRow[] {
     .sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 }
 
-function defaultVariant(product: ProductRow): VariantRow {
-  const variants = activeVariants(product);
-  const found = variants.find((variant) => variant.isDefault) ?? variants[0];
-  if (!found) {
-    throw new CatalogInconsistentError(product.id, 'missing_default_variant');
-  }
-  return found;
+const missingDefaultAvailability: CatalogAvailability = {
+  status: 'UNKNOWN',
+  purchasable: false,
+  issue: 'MISSING_DEFAULT_VARIANT',
+};
+
+function defaultVariant(product: ProductRow): VariantRow | null {
+  return activeVariants(product).find((variant) => variant.isDefault) ?? null;
 }
 
 function mapOffer(variant: VariantRow): CatalogOffer {
@@ -170,24 +170,44 @@ export function mapCategory(row: CategoryRow): CatalogCategory {
   };
 }
 
+function listingImages(product: ProductRow): CatalogMedia[] {
+  return product.images
+    .map((image) => mapImage(image, product.name))
+    .filter((image): image is CatalogMedia => image !== null);
+}
+
 export function mapProductListItem(product: ProductRow): CatalogProductListItem {
   const variants = activeVariants(product);
   const selected = defaultVariant(product);
-  const offer = mapOffer(selected);
-  const multi = variants.length > 1;
-  const images = product.images
-    .map((image) => mapImage(image, product.name))
-    .filter((image): image is CatalogMedia => image !== null);
-
-  return {
+  const images = listingImages(product);
+  const base = {
     id: product.id,
     slug: product.slug,
     name: product.name,
     shortDescription: presentText(product.shortDescription),
     category: product.category,
     image: images[0] ?? null,
+    currency: 'XOF' as const,
+  };
+
+  if (!selected) {
+    return {
+      ...base,
+      variantMode: 'SINGLE',
+      variantId: null,
+      sku: null,
+      price: null,
+      compareAtPrice: null,
+      availability: missingDefaultAvailability,
+      priceRange: null,
+    };
+  }
+
+  const offer = mapOffer(selected);
+  const multi = variants.length > 1;
+  return {
+    ...base,
     variantMode: multi ? 'MULTI' : 'SINGLE',
-    currency: 'XOF',
     variantId: offer.variantId,
     sku: offer.sku,
     price: offer.price,
@@ -200,10 +220,7 @@ export function mapProductListItem(product: ProductRow): CatalogProductListItem 
 export function mapProductDetail(product: ProductRow): CatalogProductDetail {
   const variants = activeVariants(product);
   const selected = defaultVariant(product);
-  const offer = mapOffer(selected);
-  const images = product.images
-    .map((image) => mapImage(image, product.name))
-    .filter((image): image is CatalogMedia => image !== null);
+  const images = listingImages(product);
   const shared = {
     id: product.id,
     slug: product.slug,
@@ -224,6 +241,20 @@ export function mapProductDetail(product: ProductRow): CatalogProductDetail {
     publishedAt: product.publishedAt ? product.publishedAt.toISOString() : null,
   };
 
+  if (!selected) {
+    return {
+      ...shared,
+      variantMode: 'SINGLE',
+      variantId: null,
+      sku: null,
+      price: null,
+      compareAtPrice: null,
+      weightGrams: null,
+      availability: missingDefaultAvailability,
+    };
+  }
+
+  const offer = mapOffer(selected);
   if (variants.length > 1) {
     return {
       ...shared,

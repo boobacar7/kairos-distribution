@@ -1,9 +1,9 @@
 import type { CatalogAvailability, CatalogProductDetail } from '@kairos/validation/catalog';
 
 export type DisplayOffer = {
-  variantId: string;
-  sku: string;
-  price: number;
+  variantId: string | null;
+  sku: string | null;
+  price: number | null;
   compareAtPrice: number | null;
   availability: CatalogAvailability;
 };
@@ -18,9 +18,19 @@ export function displayOffer(product: CatalogProductDetail): DisplayOffer {
       availability: product.availability,
     };
   }
-  const selected = product.variants.find((variant) => variant.isDefault) ?? product.variants[0];
+  const selected = product.variants.find((variant) => variant.isDefault);
   if (!selected) {
-    throw new Error('MULTI product is missing variants');
+    return {
+      variantId: null,
+      sku: null,
+      price: null,
+      compareAtPrice: null,
+      availability: {
+        status: 'UNKNOWN',
+        purchasable: false,
+        issue: 'MISSING_DEFAULT_VARIANT',
+      },
+    };
   }
   return {
     variantId: selected.variantId,

@@ -97,6 +97,44 @@ describe('BoutiqueView', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } });
     expect(results.violations).toEqual([]);
   });
+
+  it('keeps an ACTIVE product with no default variant visible without inventing a price', () => {
+    render(
+      <BoutiqueView
+        title={t('pages.shop.title')}
+        categories={categories}
+        products={{
+          data: [
+            {
+              id: 'p-broken',
+              slug: 'test-no-default',
+              name: '[TEST] Sans variante',
+              shortDescription: null,
+              category: { id: 'c1', slug: 'capsules', name: 'Capsules' },
+              image: null,
+              variantMode: 'SINGLE',
+              currency: 'XOF',
+              variantId: null,
+              sku: null,
+              price: null,
+              compareAtPrice: null,
+              availability: {
+                status: 'UNKNOWN',
+                purchasable: false,
+                issue: 'MISSING_DEFAULT_VARIANT',
+              },
+              priceRange: null,
+            },
+          ],
+          meta: { page: 1, limit: 24, total: 1, pageCount: 1 },
+        }}
+        query={query}
+      />,
+    );
+    expect(screen.getByText('[TEST] Sans variante')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(t('catalog.inconsistent'));
+    expect(screen.queryByText(/\d[\d\s]*FCFA/)).not.toBeInTheDocument();
+  });
 });
 
 describe('ProductDetailView', () => {

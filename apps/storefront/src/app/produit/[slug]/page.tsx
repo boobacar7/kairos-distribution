@@ -61,10 +61,13 @@ export async function generateMetadata({
           ? [{ url: product.images[0].url, alt: product.images[0].alt }]
           : undefined,
       },
-      other: {
-        'product:price:amount': String(offer.price),
-        'product:price:currency': 'XOF',
-      },
+      other:
+        offer.price != null
+          ? {
+              'product:price:amount': String(offer.price),
+              'product:price:currency': 'XOF',
+            }
+          : undefined,
     };
   } catch (error) {
     if (error instanceof CatalogNotFoundError || error instanceof CatalogUnavailableError) {

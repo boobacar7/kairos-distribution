@@ -7,7 +7,6 @@ import type {
   ProductListQuery,
 } from '@kairos/validation/catalog';
 
-import { CatalogInconsistentError } from './catalog.errors.js';
 import { mapCategory, mapProductDetail, mapProductListItem } from './catalog.mapper.js';
 import { CatalogRepository } from './catalog.repository.js';
 
@@ -35,18 +34,7 @@ export class CatalogService {
     const { rows, total } = await this.repository.listPublicProducts(query, {
       hideTestProducts: this.hideTestProducts,
     });
-    const data: CatalogProductListItem[] = [];
-    for (const row of rows) {
-      try {
-        data.push(mapProductListItem(row));
-      } catch (error) {
-        if (error instanceof CatalogInconsistentError) {
-          console.error(error);
-          continue;
-        }
-        throw error;
-      }
-    }
+    const data = rows.map(mapProductListItem);
     const pageCount = total === 0 ? 0 : Math.ceil(total / query.limit);
     return {
       data,

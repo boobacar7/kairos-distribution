@@ -58,18 +58,22 @@ export function ProductDetailView({ product }: { product: CatalogProductDetail }
           <p className="text-caption text-botanical">{product.category.name}</p>
           <h1 className="font-serif text-h2 text-aubergine md:text-h1">{product.name}</h1>
           {isTestDataName(product.name) ? <Badge tone="warning">{t('test.badge')}</Badge> : null}
-          <PriceDisplay
-            amount={money(offer.price)}
-            compareAt={offer.compareAtPrice != null ? money(offer.compareAtPrice) : undefined}
-          />
+          {offer.price != null ? (
+            <PriceDisplay
+              amount={money(offer.price)}
+              compareAt={offer.compareAtPrice != null ? money(offer.compareAtPrice) : undefined}
+            />
+          ) : null}
           {offer.availability.status === 'UNKNOWN' ? null : (
             <StockBadge tone={purchasable ? 'inStock' : 'out'}>
               {purchasable ? t('stock.available') : t('stock.out')}
             </StockBadge>
           )}
-          <p className="text-body-sm text-botanical">
-            {t('catalog.sku')}: {offer.sku}
-          </p>
+          {offer.sku ? (
+            <p className="text-body-sm text-botanical">
+              {t('catalog.sku')}: {offer.sku}
+            </p>
+          ) : null}
           {product.shortDescription ? (
             <p className="text-body text-ink max-w-prose">{product.shortDescription}</p>
           ) : null}
@@ -77,6 +81,7 @@ export function ProductDetailView({ product }: { product: CatalogProductDetail }
             variantId={offer.variantId}
             purchasable={purchasable}
             inventoryIssue={offer.availability.status === 'UNKNOWN'}
+            inconsistency={offer.availability.issue === 'MISSING_DEFAULT_VARIANT'}
           />
         </div>
       </div>

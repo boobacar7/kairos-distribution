@@ -34,18 +34,22 @@ export function productJsonLd(
   if (images.length > 0) {
     jsonLd.image = images;
   }
-  jsonLd.sku = offer.sku;
-
-  const offers: Record<string, unknown> = {
-    '@type': 'Offer',
-    price: offer.price,
-    priceCurrency: CURRENCY,
-    url: canonical,
-  };
-  if (availability) {
-    offers.availability = availability;
+  if (offer.sku) {
+    jsonLd.sku = offer.sku;
   }
-  jsonLd.offers = offers;
+
+  if (offer.price != null) {
+    const offers: Record<string, unknown> = {
+      '@type': 'Offer',
+      price: offer.price,
+      priceCurrency: CURRENCY,
+      url: canonical,
+    };
+    if (availability) {
+      offers.availability = availability;
+    }
+    jsonLd.offers = offers;
+  }
 
   return jsonLd;
 }

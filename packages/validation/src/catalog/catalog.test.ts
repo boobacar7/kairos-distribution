@@ -80,4 +80,34 @@ describe('public product DTOs', () => {
     });
     expect(parsed.data[0]).not.toHaveProperty('cost');
   });
+
+  it('accepts a list item with a missing default variant and no invented offer', () => {
+    const parsed = productListResponseSchema.parse({
+      data: [
+        {
+          id: 'p1',
+          slug: 'test-product',
+          name: '[TEST] Product',
+          shortDescription: null,
+          category: { id: 'c1', slug: 'capsules', name: 'Capsules' },
+          image: null,
+          variantMode: 'SINGLE',
+          currency: 'XOF',
+          variantId: null,
+          sku: null,
+          price: null,
+          compareAtPrice: null,
+          availability: {
+            status: 'UNKNOWN',
+            purchasable: false,
+            issue: 'MISSING_DEFAULT_VARIANT',
+          },
+          priceRange: null,
+        },
+      ],
+      meta: { page: 1, limit: 24, total: 1, pageCount: 1 },
+    });
+    expect(parsed.data[0]?.price).toBeNull();
+    expect(parsed.data[0]?.availability.issue).toBe('MISSING_DEFAULT_VARIANT');
+  });
 });

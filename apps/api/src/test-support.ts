@@ -47,8 +47,8 @@ export async function createCatalogApp(): Promise<INestApplication> {
 export type CreatedProduct = {
   id: string;
   slug: string;
-  variantId: string;
-  sku: string;
+  variantId: string | null;
+  sku: string | null;
   name: string;
   categorySlug: string;
 };
@@ -63,6 +63,7 @@ export async function createPublicProduct(
     price?: number;
     sku?: string;
     inventory?: 'tracked' | 'untracked' | 'missing';
+    variants?: 'default' | 'none';
     onHand?: number;
     description?: string | null;
     benefits?: string | null;
@@ -97,11 +98,22 @@ export async function createPublicProduct(
       ingredients: options.ingredients ?? null,
       usage: options.usage ?? null,
       precautions: options.precautions ?? null,
-      minPrice: price,
-      maxPrice: price,
+      minPrice: options.variants === 'none' ? null : price,
+      maxPrice: options.variants === 'none' ? null : price,
       publishedAt,
     },
   });
+
+  if (options.variants === 'none') {
+    return {
+      id: product.id,
+      slug,
+      variantId: null,
+      sku: null,
+      name,
+      categorySlug,
+    };
+  }
 
   const variant = await client.productVariant.create({
     data: {

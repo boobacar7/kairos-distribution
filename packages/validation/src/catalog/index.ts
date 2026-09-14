@@ -11,7 +11,7 @@ export const catalogAvailabilityStatuses = [
 ] as const;
 export type CatalogAvailabilityStatus = (typeof catalogAvailabilityStatuses)[number];
 
-export const catalogAvailabilityIssues = ['MISSING_INVENTORY'] as const;
+export const catalogAvailabilityIssues = ['MISSING_INVENTORY', 'MISSING_DEFAULT_VARIANT'] as const;
 export type CatalogAvailabilityIssue = (typeof catalogAvailabilityIssues)[number];
 
 export const productSortValues = ['default', 'price_asc', 'price_desc', 'newest'] as const;
@@ -98,9 +98,9 @@ const listingProductBase = z.object({
 });
 
 export const catalogProductListItemSchema = listingProductBase.extend({
-  variantId: z.string().min(1),
-  sku: z.string().min(1),
-  price: moneySchema,
+  variantId: z.string().min(1).nullable(),
+  sku: z.string().min(1).nullable(),
+  price: moneySchema.nullable(),
   compareAtPrice: moneySchema.nullable(),
   availability: catalogAvailabilitySchema,
   priceRange: z
@@ -133,9 +133,9 @@ const productDetailShared = listingProductBase.extend({
 
 export const catalogProductDetailSingleSchema = productDetailShared.extend({
   variantMode: z.literal('SINGLE'),
-  variantId: z.string().min(1),
-  sku: z.string().min(1),
-  price: moneySchema,
+  variantId: z.string().min(1).nullable(),
+  sku: z.string().min(1).nullable(),
+  price: moneySchema.nullable(),
   compareAtPrice: moneySchema.nullable(),
   weightGrams: z.number().int().nonnegative().nullable(),
   availability: catalogAvailabilitySchema,

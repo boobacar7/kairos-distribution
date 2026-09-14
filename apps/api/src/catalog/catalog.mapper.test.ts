@@ -75,4 +75,29 @@ describe('catalog mapper', () => {
       issue: 'MISSING_INVENTORY',
     });
   });
+
+  it('maps ACTIVE products with no default variant to an explicit inconsistency without inventing an offer', () => {
+    const item = mapProductListItem(product({ variants: [] }));
+    expect(item).toEqual(
+      expect.objectContaining({
+        id: 'p1',
+        slug: 'test-creme',
+        variantId: null,
+        sku: null,
+        price: null,
+        compareAtPrice: null,
+        availability: {
+          status: 'UNKNOWN',
+          purchasable: false,
+          issue: 'MISSING_DEFAULT_VARIANT',
+        },
+      }),
+    );
+    const detail = mapProductDetail(product({ variants: [] }));
+    expect(detail.variantMode).toBe('SINGLE');
+    if (detail.variantMode !== 'SINGLE') throw new Error('expected SINGLE');
+    expect(detail.price).toBeNull();
+    expect(detail.variantId).toBeNull();
+    expect(detail.availability.issue).toBe('MISSING_DEFAULT_VARIANT');
+  });
 });

@@ -18,8 +18,19 @@ function stockProps(product: CatalogProductListItem): {
   return { stock: 'out', stockLabel: t('stock.out') };
 }
 
+function inconsistencyCopy(product: CatalogProductListItem): string | null {
+  if (product.availability.issue === 'MISSING_DEFAULT_VARIANT') {
+    return t('catalog.inconsistent');
+  }
+  if (product.availability.status === 'UNKNOWN') {
+    return t('catalog.inventoryError');
+  }
+  return null;
+}
+
 export function CatalogueProductCard({ product }: { product: CatalogProductListItem }) {
   const stock = stockProps(product);
+  const inconsistency = inconsistencyCopy(product);
   return (
     <Card>
       <div className="relative">
@@ -50,15 +61,17 @@ export function CatalogueProductCard({ product }: { product: CatalogProductListI
         <a href={`/produit/${product.slug}`} className="hover:text-botanical">
           <p className="font-serif text-h4 text-aubergine">{product.name}</p>
         </a>
-        <PriceDisplay
-          amount={money(product.price)}
-          compareAt={product.compareAtPrice != null ? money(product.compareAtPrice) : undefined}
-        />
+        {product.price != null ? (
+          <PriceDisplay
+            amount={money(product.price)}
+            compareAt={product.compareAtPrice != null ? money(product.compareAtPrice) : undefined}
+          />
+        ) : null}
         {stock.stock && stock.stockLabel ? (
           <StockBadge tone={stock.stock}>{stock.stockLabel}</StockBadge>
-        ) : product.availability.status === 'UNKNOWN' ? (
+        ) : inconsistency ? (
           <p className="text-caption text-ink" role="status">
-            {t('catalog.inventoryError')}
+            {inconsistency}
           </p>
         ) : null}
         <a

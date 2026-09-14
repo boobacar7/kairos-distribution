@@ -10,10 +10,12 @@ export function AddToCartPanel({
   variantId,
   purchasable,
   inventoryIssue,
+  inconsistency,
 }: {
-  variantId: string;
+  variantId: string | null;
   purchasable: boolean;
   inventoryIssue: boolean;
+  inconsistency?: boolean;
 }) {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export function AddToCartPanel({
         fullWidth
         disabled={!purchasable}
         onClick={() => {
-          const result = prepareAddToCart({ variantId, quantity });
+          const result = prepareAddToCart({ variantId: variantId ?? '', quantity });
           if (result.code === 'CART_NOT_IMPLEMENTED') {
             setMessage(t('catalog.cartPending'));
             return;
@@ -43,7 +45,11 @@ export function AddToCartPanel({
       >
         {t('catalog.addToCart')}
       </Button>
-      {inventoryIssue ? <Alert tone="warning">{t('catalog.inventoryError')}</Alert> : null}
+      {inconsistency ? (
+        <Alert tone="warning">{t('catalog.inconsistent')}</Alert>
+      ) : inventoryIssue ? (
+        <Alert tone="warning">{t('catalog.inventoryError')}</Alert>
+      ) : null}
       {message ? (
         <Alert tone="info">
           <p role="status">{message}</p>
