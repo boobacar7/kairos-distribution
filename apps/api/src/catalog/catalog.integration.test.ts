@@ -9,7 +9,7 @@ import {
   ensureSeeded,
   testPrisma,
   type CreatedProduct,
-} from './test-support.js';
+} from '../test-support.js';
 
 describe('catalog API', () => {
   let app: INestApplication;

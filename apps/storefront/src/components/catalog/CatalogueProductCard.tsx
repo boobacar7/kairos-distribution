@@ -1,4 +1,4 @@
-import { Badge, Card, CardBody, CardMedia, CardTitle, PriceDisplay, StockBadge } from '@kairos/ui';
+import { Badge, Card, CardBody, CardMedia, PriceDisplay, StockBadge } from '@kairos/ui';
 import { isTestDataName } from '@kairos/types';
 import { money } from '@kairos/types/money';
 import type { CatalogProductListItem } from '@kairos/validation/catalog';
@@ -23,12 +23,12 @@ export function CatalogueProductCard({ product }: { product: CatalogProductListI
   return (
     <Card>
       <div className="relative">
-        <a href={`/produit/${product.slug}`} className="block">
+        <a href={`/produit/${product.slug}`} className="block" aria-label={product.name}>
           <CardMedia>
             {product.image ? (
               <img
                 src={product.image.url}
-                alt={product.image.alt}
+                alt=""
                 width={product.image.width ?? 600}
                 height={product.image.height ?? 750}
                 className="h-full w-full object-cover"
@@ -48,7 +48,7 @@ export function CatalogueProductCard({ product }: { product: CatalogProductListI
       <CardBody>
         <p className="text-caption text-botanical">{product.category.name}</p>
         <a href={`/produit/${product.slug}`} className="hover:text-botanical">
-          <CardTitle>{product.name}</CardTitle>
+          <p className="font-serif text-h4 text-aubergine">{product.name}</p>
         </a>
         <PriceDisplay
           amount={money(product.price)}

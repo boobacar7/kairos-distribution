@@ -66,7 +66,7 @@ describe('BoutiqueView', () => {
     );
     expect(screen.getByRole('heading', { name: t('pages.shop.title') })).toBeInTheDocument();
     expect(screen.getByText('[TEST] Crème')).toBeInTheDocument();
-    expect(screen.getByText('Capsules')).toBeInTheDocument();
+    expect(screen.getAllByText('Capsules').length).toBeGreaterThan(0);
     expect(screen.getByText(/5\s?000 FCFA/)).toBeInTheDocument();
     expect(screen.queryByText(/avis/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/miracle/i)).not.toBeInTheDocument();

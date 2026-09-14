@@ -127,7 +127,8 @@ export async function createPublicProduct(
           onHandQty: onHand,
           reservedQty: 0,
           availableQty: onHand,
-          isOutOfStock: trackInventory && onHand <= 0,
+          // inventory_flags_math: isOutOfStock = (availableQty <= 0) regardless of tracking.
+          isOutOfStock: onHand <= 0,
           isLowStock: trackInventory && onHand <= 5,
           lowStockThreshold: 5,
         },

@@ -24,7 +24,8 @@ export const variantModes = ['SINGLE', 'MULTI'] as const;
 export type VariantMode = (typeof variantModes)[number];
 
 const emptyToUndefined = (value: unknown) => {
-  if (value === '' || value === undefined || value === null) return undefined;
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === 'string' && value.trim() === '') return undefined;
   return value;
 };
 
