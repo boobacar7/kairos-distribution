@@ -79,11 +79,9 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
               product.rating != null && product.reviewCount != null && product.reviewCount > 0
                 ? product.rating
                 : undefined;
-            const plusClassName =
-              'bg-botanical text-ivory inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full md:h-8 md:w-8';
             return (
               <li key={product.id}>
-                <article className="flex flex-col gap-1.5 md:flex-row md:items-center md:gap-3">
+                <article className="relative flex flex-col gap-1.5 md:flex-row md:items-center md:gap-3 md:pr-10">
                   <a href={`/produit/${product.slug}`} className="shrink-0">
                     {product.image ? (
                       <img
@@ -98,7 +96,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[7.5rem] md:w-[7.5rem]" />
                     )}
                   </a>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 pr-9 md:pr-0">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
                         <h3 className="text-botanical text-caption leading-tight font-semibold md:text-body-sm">
@@ -115,29 +113,20 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       ) : null}
                     </div>
                     {rating !== undefined ? (
-                      <p className="mt-0.5 flex flex-nowrap items-center gap-1">
+                      <p className="mt-0.5 flex flex-wrap items-center gap-x-1">
                         <StarRow value={rating} label={t('reviews.rating', { value: rating })} />
                         <span className="text-botanical/70 text-caption">
                           {t('product.stars', { count: product.reviewCount ?? 0 })}
                         </span>
                       </p>
                     ) : null}
-                    <div className="mt-1 flex items-center justify-between gap-1 md:justify-start">
-                      <p className="text-botanical text-caption whitespace-nowrap font-semibold md:text-body-sm">
-                        {formatPrice(product.price)}
-                      </p>
-                      <a
-                        href={`/produit/${product.slug}`}
-                        className={`${plusClassName} md:hidden`}
-                        aria-label={t('product.add', { name: product.name })}
-                      >
-                        <PlusGlyph className="h-3.5 w-3.5" />
-                      </a>
-                    </div>
+                    <p className="text-botanical mt-1 text-caption whitespace-nowrap font-semibold md:text-body-sm">
+                      {formatPrice(product.price)}
+                    </p>
                   </div>
                   <a
                     href={`/produit/${product.slug}`}
-                    className={`${plusClassName} hidden md:inline-flex`}
+                    className="bg-botanical text-ivory absolute right-0 bottom-0 inline-flex h-7 w-7 items-center justify-center rounded-full md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:h-8 md:w-8"
                     aria-label={t('product.add', { name: product.name })}
                   >
                     <PlusGlyph className="h-3.5 w-3.5" />
