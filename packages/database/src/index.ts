@@ -37,6 +37,7 @@ export {
   claimGuestOrder,
   assertTokenNotDerivedFromReference,
 } from './guest-claim.js';
+export { seedReference, seedDev, runSeed, type SeedProfile } from './seed.js';
 
 /** Placeholder from the Phase 1 shell, kept so existing imports do not break. */
 export const DATABASE_PACKAGE_READY = true;

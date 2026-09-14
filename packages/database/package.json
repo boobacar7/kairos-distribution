@@ -21,8 +21,8 @@
   "scripts": {
     "generate": "prisma generate",
     "build": "prisma generate && tsc --build",
-    "typecheck": "prisma generate && tsc --build",
-    "test": "prisma generate && vitest run",
+    "typecheck": "tsc --build",
+    "test": "vitest run",
     "clean": "tsc --build --clean",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

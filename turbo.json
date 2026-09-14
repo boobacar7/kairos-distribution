@@ -11,7 +11,9 @@
     "KAIROS_API_URL",
     "STOREFRONT_SITE_URL",
     "STOREFRONT_REVALIDATE_SECRET",
-    "STOREFRONT_USE_TEST_CATALOGUE"
+    "STOREFRONT_USE_TEST_CATALOGUE",
+    "PORT",
+    "CORS_ORIGIN"
   ],
   "tasks": {
     "build": {
@@ -65,7 +67,9 @@
         "SEED_ADMIN_PASSWORD",
         "KAIROS_API_URL",
         "STOREFRONT_SITE_URL",
-        "STOREFRONT_USE_TEST_CATALOGUE"
+        "STOREFRONT_USE_TEST_CATALOGUE",
+        "PORT",
+        "CORS_ORIGIN"
       ]
     },
     "clean": {
