@@ -36,6 +36,26 @@ export const envSchema = baseEnvSchema.extend(databaseEnvSchema.shape);
 
 export type Env = z.infer<typeof envSchema>;
 
+/**
+ * Storefront process env. Intentionally separate from `envSchema`: the Next app must never
+ * require `DATABASE_URL` (architecture.md §3.2 — Prisma is API-only).
+ *
+ * `KAIROS_API_URL` is optional until BACKEND/CMS land. When it is unset the storefront consumes
+ * the approved visual homepage stub (or the labelled `[TEST]` catalogue when that flag is on).
+ * Empty CMS payloads still render per-section empty states.
+ */
+export const storefrontEnvSchema = baseEnvSchema.extend({
+  KAIROS_API_URL: z.string().url().optional(),
+  STOREFRONT_SITE_URL: z.string().url().default('http://127.0.0.1:3000'),
+  STOREFRONT_REVALIDATE_SECRET: z.string().min(16).optional(),
+  STOREFRONT_USE_TEST_CATALOGUE: z
+    .string()
+    .optional()
+    .transform((value) => value === 'true' || value === '1'),
+});
+
+export type StorefrontEnv = z.infer<typeof storefrontEnvSchema>;
+
 export class EnvironmentValidationError extends Error {
   public readonly issues: readonly string[];
 
@@ -57,6 +77,20 @@ export class EnvironmentValidationError extends Error {
  */
 export function parseEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const result = envSchema.safeParse(source);
+
+  if (!result.success) {
+    const issues = result.error.issues.map((issue) => {
+      const path = issue.path.join('.');
+      return path.length > 0 ? `${path}: ${issue.message}` : issue.message;
+    });
+    throw new EnvironmentValidationError(issues);
+  }
+
+  return result.data;
+}
+
+export function parseStorefrontEnv(source: NodeJS.ProcessEnv = process.env): StorefrontEnv {
+  const result = storefrontEnvSchema.safeParse(source);
 
   if (!result.success) {
     const issues = result.error.issues.map((issue) => {

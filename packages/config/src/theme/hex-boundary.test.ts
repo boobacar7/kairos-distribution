@@ -22,6 +22,7 @@ const SKIP_DIR_NAMES = new Set([
   'coverage',
   'generated',
   '.cache',
+  '.next',
 ]);
 
 const SCAN_EXTENSIONS = new Set([

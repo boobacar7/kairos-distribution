@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+@import '@kairos/config/theme';
+
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+@source './**/*.{ts,tsx}';
+@source '../**/*.{ts,tsx}';
+
+/*
+ * Homepage hero uses the CMS carousel primitive. The approved frames are photographic
+ * banners with botanical copy already in the crop, muted chrome, and botanical dots —
+ * not the inverse botanical slab the primitive ships with. Overrides stay on tokens.
+ */
+.home-hero [data-surface='inverse'] {
+  background-color: transparent;
+  color: var(--color-botanical);
+  border-radius: var(--radius-xl);
+}
+
+.home-hero [data-surface='inverse'] .relative.min-h-72,
+.home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
+  /* ~2:1 so the mobile hero crop is not side-clipped */
+  min-height: 9.5rem;
+}
+
+@media (min-width: 48rem) {
+  .home-hero [data-surface='inverse'] .relative.min-h-72,
+  .home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
+    min-height: 15.75rem;
+  }
+}
+
+.home-hero [data-surface='inverse'] h2,
+.home-hero [data-surface='inverse'] p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.home-hero [data-surface='inverse'] a[data-cta] {
+  /* Photography already includes the Découvrir pill. Keep a real hit-target on top. */
+  position: absolute;
+  left: 1.25rem;
+  bottom: 2.5rem;
+  z-index: 15;
+  width: 9.25rem;
+  height: 2.75rem;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  background-color: transparent;
+  border-radius: var(--radius-full);
+}
+
+@media (min-width: 48rem) {
+  .home-hero [data-surface='inverse'] a[data-cta] {
+    left: 2.75rem;
+    bottom: 3.25rem;
+    width: 10.5rem;
+  }
+}
+
+.home-hero [aria-roledescription='carousel'] {
+  /* Keep overflow on the photo frame so the toolbar focus ring is not clipped. */
+  overflow: visible;
+}
+
+.home-hero [role='toolbar'] {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.home-hero [role='toolbar']:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.home-hero [role='toolbar'] :focus-visible {
+  outline: 2px solid var(--color-ring-inverse);
+  outline-offset: 3px;
+}
+
+.home-hero [aria-roledescription='carousel'] ul.absolute button {
+  background-color: var(--color-botanical);
+  opacity: 0.28;
+}
+
+.home-hero [aria-roledescription='carousel'] ul.absolute button[aria-current='true'] {
+  opacity: 1;
+}
+
+.storefront-footer-light footer {
+  background-color: var(--color-ivory);
+  color: var(--color-botanical);
+  border-top: 1px solid var(--color-beige);
+  margin-top: 0.25rem;
+  padding-block: 0.5rem;
+}

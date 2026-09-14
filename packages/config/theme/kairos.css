@@ -23,6 +23,10 @@
   --color-coral: #e86f5b;
   --color-aubergine: #3c2635;
   --color-ink: #18211d;
+  /* Homepage frames: star glyphs. Not a text colour on ivory. */
+  --color-gold: #c88b43;
+  /* WhatsApp brand fill for the storefront FAB (third-party, not Kairos). */
+  --color-whatsapp: #25d366;
 
   --color-surface: var(--color-ivory);
   --color-surface-muted: var(--color-soft-green);

@@ -29,7 +29,7 @@ function normalizeHex(hex: string): string {
 }
 
 describe('palette contract', () => {
-  it('defines every spec §3 colour exactly once', () => {
+  it('defines spec §3 colours plus Bob’s homepage tokens', () => {
     expect(PALETTE).toEqual({
       ivory: '#F8F5EF',
       beige: '#D8C5AD',
@@ -39,8 +39,10 @@ describe('palette contract', () => {
       coral: '#E86F5B',
       aubergine: '#3C2635',
       ink: '#18211D',
+      gold: '#C88B43',
+      whatsapp: '#25D366',
     });
-    expect(new Set(PALETTE_HEXES).size).toBe(8);
+    expect(new Set(PALETTE_HEXES).size).toBe(10);
   });
 
   it('writes each palette hex into the Tailwind @theme file', () => {
@@ -69,12 +71,15 @@ describe('contrast matrix', () => {
     expect(paletteContrast('beige', 'ivory')).toBeLessThan(WCAG_AA_TEXT);
     expect(paletteContrast('powderPink', 'ivory')).toBeLessThan(WCAG_AA_TEXT);
     expect(paletteContrast('coral', 'ivory')).toBeLessThan(WCAG_AA_LARGE_TEXT);
+    expect(paletteContrast('gold', 'ivory')).toBeLessThan(WCAG_AA_LARGE_TEXT);
 
     const decorativeOnIvory = APPROVED_PAIRS.filter(
       (pair) => pair.background === 'ivory' && pair.role === 'decorative',
     ).map((pair) => pair.foreground);
 
-    expect(decorativeOnIvory).toEqual(expect.arrayContaining(['beige', 'powderPink', 'coral']));
+    expect(decorativeOnIvory).toEqual(
+      expect.arrayContaining(['beige', 'powderPink', 'coral', 'gold']),
+    );
   });
 
   it('every non-decorative approved pair actually meets the WCAG AA threshold for its role', () => {
