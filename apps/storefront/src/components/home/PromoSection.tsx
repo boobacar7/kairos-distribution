@@ -43,7 +43,7 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                       {banner.eyebrow}
                     </p>
                   ) : null}
-                  <h3 className="font-serif text-body leading-tight whitespace-nowrap text-botanical md:text-h2">
+                  <h3 className="font-serif text-h4 leading-tight whitespace-nowrap text-botanical md:text-h2">
                     {banner.title}{' '}
                     {banner.highlight ? (
                       <span className="text-coral">{banner.highlight}</span>

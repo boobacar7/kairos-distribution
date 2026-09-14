@@ -92,17 +92,17 @@ export function PlusGlyph({ className }: { className?: string }) {
 export function LeafGlyph({ className }: { className?: string }) {
   return (
     <Icon className={className ?? 'h-8 w-8'} fill="currentColor" stroke="none">
-      <path d="M12 2.5c.8 1.2 1.4 2.4 1.6 3.7 3.6.6 6.6 3.4 7.4 7.1-1.2 4.8-5.6 8.2-10.5 8.2-1.7 0-3.2-.4-4.5-1.2C3.6 16 2.8 10.6 6 6.2c1.7-2.3 3.8-3.4 6-3.7Z" />
+      <path d="M18.8 4.2c-2.8.4-6.8 2.2-9.6 5.1C6 12.6 4.6 16.8 5.8 20c.5.2 1.2.2 1.8 0 3.6-1.4 7.6-4.8 10.2-9.2 1.4-2.4 1.6-4.6 1-6.6Z" />
       <path
-        d="M11.2 5.2c.2 3.4.1 6.7-1.6 10.2"
+        d="M7.2 18.4c2.2-2 4.8-5.4 6.2-9.6"
         stroke="var(--color-ivory)"
-        strokeWidth="1.5"
+        strokeWidth="1.35"
         fill="none"
       />
       <path
-        d="M11.4 9.2c1.6 1 3.2 1.4 4.8 1.3M10.6 12.4c1.3.8 2.6 1.2 4.1 1.2"
+        d="M12.4 6.2c2.4 1.6 3.6 3.4 4 5.2"
         stroke="var(--color-ivory)"
-        strokeWidth="1.15"
+        strokeWidth="1.1"
         fill="none"
       />
     </Icon>
@@ -111,11 +111,11 @@ export function LeafGlyph({ className }: { className?: string }) {
 
 export function CupGlyph({ className }: { className?: string }) {
   return (
-    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.9}>
-      <path d="M8 5.2c.6 1.1.6 2.2 0 3.2M11 4.8c.7 1.2.7 2.4 0 3.5M14 5.2c.6 1.1.6 2.2 0 3.2" />
-      <path d="M5.5 9.5h10.2v4.2a4.8 4.8 0 0 1-10.2 0z" fill="currentColor" stroke="none" />
-      <path d="M15.7 10.2h2.2a2.3 2.3 0 0 1 0 4.6h-1.6" />
-      <path d="M7.2 19.2h7.6" />
+    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.7}>
+      <path d="M8.2 4.6c.5 1 .5 2 0 3M11.2 4.2c.55 1.1.55 2.2 0 3.3M14.2 4.6c.5 1 .5 2 0 3" />
+      <path d="M6 9.2h9.2a4.6 4.6 0 0 1-9.2 0Z" />
+      <path d="M15.2 10.2h2.1a2.15 2.15 0 0 1 0 4.3h-1.2" />
+      <path d="M7.2 19.4h8.2" />
     </Icon>
   );
 }
@@ -123,27 +123,22 @@ export function CupGlyph({ className }: { className?: string }) {
 export function CapsuleGlyph({ className }: { className?: string }) {
   return (
     <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.7}>
-      <path d="M8.2 15.8a4.2 4.2 0 0 1 0-5.9l5.7-5.7a4.2 4.2 0 1 1 5.9 5.9l-5.7 5.7a4.2 4.2 0 0 1-5.9 0Z" />
-      <path d="m9.6 14.4 5.9-5.9" />
-      <path
-        d="M8.8 12.2c.6 2 2.6 3.4 4.8 3.2"
-        fill="currentColor"
-        fillOpacity="0.35"
-        stroke="none"
-      />
+      <g transform="rotate(-40 12 12)">
+        <rect x="8.4" y="3.6" width="7.2" height="16.8" rx="3.6" />
+        <path d="M8.4 12h7.2" />
+      </g>
     </Icon>
   );
 }
 
 export function GiftGlyph({ className }: { className?: string }) {
   return (
-    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.9}>
-      <path d="M4.5 10.5h15v9.2H4.5z" fill="currentColor" fillOpacity="0.18" />
-      <path d="M4.5 10.5h15v9.2H4.5z" />
-      <path d="M4.5 10.5V8.2h15V10.5" />
-      <path d="M12 8.2v11.5" />
-      <path d="M12 8.2c-.2-2.8-2.8-3.8-4.2-2.2C6.4 7.6 8.2 9.6 12 8.2" fill="currentColor" />
-      <path d="M12 8.2c.2-2.8 2.8-3.8 4.2-2.2C17.6 7.6 15.8 9.6 12 8.2" fill="currentColor" />
+    <Icon className={className ?? 'h-8 w-8'} strokeWidth={1.7}>
+      <rect x="5" y="10.2" width="14" height="9.3" rx="0.6" />
+      <path d="M5 10.2V8.2h14v2" />
+      <path d="M12 8.2v11.3" />
+      <path d="M12 8.2c-.4-2.6-2.8-3.4-4-1.8-1 1.2.4 2.8 4 1.8" />
+      <path d="M12 8.2c.4-2.6 2.8-3.4 4-1.8 1 1.2-.4 2.8-4 1.8" />
     </Icon>
   );
 }

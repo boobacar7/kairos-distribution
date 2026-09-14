@@ -89,21 +89,21 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         alt={product.image.alt}
                         width={product.image.width ?? 160}
                         height={product.image.height ?? 160}
-                        className="h-16 w-full rounded-lg object-cover md:h-[7.25rem] md:w-[7.25rem]"
+                        className="h-[4.75rem] w-full rounded-lg object-cover md:h-[8.25rem] md:w-[8.25rem]"
                         loading="lazy"
                       />
                     ) : (
-                      <span className="bg-soft-green block h-16 w-full rounded-lg md:h-[7.25rem] md:w-[7.25rem]" />
+                      <span className="bg-soft-green block h-[4.75rem] w-full rounded-lg md:h-[8.25rem] md:w-[8.25rem]" />
                     )}
                   </a>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
-                        <h3 className="text-botanical text-[0.6875rem] leading-tight font-semibold md:text-body-sm">
+                        <h3 className="text-botanical text-[0.65rem] leading-none font-semibold tracking-tight md:text-body-sm md:leading-tight md:tracking-normal">
                           {product.name}
                         </h3>
                         {product.subtitle ? (
-                          <p className="text-botanical/70 text-[0.625rem] leading-tight md:text-caption">
+                          <p className="text-botanical/70 text-[0.6rem] leading-tight tracking-tight md:text-caption md:tracking-normal">
                             {product.subtitle}
                           </p>
                         ) : null}
@@ -120,17 +120,19 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         </span>
                       </p>
                     ) : null}
-                    <p className="text-botanical mt-0.5 text-[0.6875rem] leading-tight font-semibold md:pr-2 md:text-body-sm">
-                      {formatPrice(product.price)}
-                    </p>
+                    <div className="mt-0.5 flex items-center gap-1">
+                      <p className="text-botanical min-w-0 text-[0.6rem] leading-tight font-semibold whitespace-nowrap md:pr-2 md:text-body-sm">
+                        {formatPrice(product.price)}
+                      </p>
+                      <a
+                        href={`/produit/${product.slug}`}
+                        className="bg-botanical text-ivory inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full md:absolute md:top-1/2 md:right-0 md:h-8 md:w-8 md:-translate-y-1/2"
+                        aria-label={t('product.add', { name: product.name })}
+                      >
+                        <PlusGlyph className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                      </a>
+                    </div>
                   </div>
-                  <a
-                    href={`/produit/${product.slug}`}
-                    className="bg-botanical text-ivory absolute top-1 right-1 inline-flex h-6 w-6 items-center justify-center rounded-full md:top-1/2 md:right-0 md:h-8 md:w-8 md:-translate-y-1/2"
-                    aria-label={t('product.add', { name: product.name })}
-                  >
-                    <PlusGlyph className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                  </a>
                 </article>
               </li>
             );
