@@ -56,17 +56,52 @@ const ALLOWED_DEPENDENCIES: Readonly<Record<string, readonly string[]>> = {
   '@kairos/admin': ['@kairos/config', '@kairos/types', '@kairos/validation', '@kairos/ui'],
 };
 
-/** Why a given edge is forbidden, so the error explains the rule instead of just refusing. */
-const RULE_EXPLANATIONS: Readonly<Record<string, string>> = {
-  '@kairos/database':
-    'Prisma is API-only. A Next.js app importing it pulls the query engine into the client ' +
-    'dependency graph, exposes the full model surface, and makes DATABASE_URL a frontend secret. ' +
-    'Frontends consume HTTP DTOs from @kairos/validation instead. (architecture.md §3.2 rule 3)',
-  '@kairos/validation':
-    '@kairos/ui must stay presentational: a dumb input plus app-level schema wiring. Importing ' +
-    'validation into the design system duplicates business rules into components. ' +
-    '(architecture.md §3.2 rule 4)',
-};
+/**
+ * Why a particular edge is forbidden, so the error explains the rule rather than just refusing.
+ *
+ * Keyed on the source/target pair, not the target alone: a reason that is right for one source
+ * and wrong for another is worse than no reason at all.
+ */
+const RULE_EXPLANATIONS: readonly {
+  from?: string;
+  to: string;
+  reason: string;
+}[] = [
+  {
+    to: '@kairos/database',
+    reason:
+      'Prisma is API-only. Anything but apps/api importing it pulls the query engine into that ' +
+      "package's dependency graph, exposes the full model surface, and — in a frontend — makes " +
+      'DATABASE_URL a client secret. Consume HTTP DTOs from @kairos/validation instead. ' +
+      '(architecture.md §3.2 rule 3)',
+  },
+  {
+    from: '@kairos/ui',
+    to: '@kairos/validation',
+    reason:
+      '@kairos/ui must stay presentational: a dumb input plus app-level schema wiring. Importing ' +
+      'validation into the design system duplicates business rules into components. ' +
+      '(architecture.md §3.2 rule 4)',
+  },
+  {
+    to: '@kairos/storefront',
+    reason: 'No package or app may depend on an application. (architecture.md §3.2 rules 1 and 2)',
+  },
+  {
+    to: '@kairos/admin',
+    reason: 'No package or app may depend on an application. (architecture.md §3.2 rules 1 and 2)',
+  },
+  {
+    to: '@kairos/api',
+    reason: 'No package or app may depend on an application. (architecture.md §3.2 rules 1 and 2)',
+  },
+];
+
+function explainForbiddenEdge(from: string, to: string): string | undefined {
+  return RULE_EXPLANATIONS.find(
+    (rule) => rule.to === to && (rule.from === undefined || rule.from === from),
+  )?.reason;
+}
 
 interface InternalEdge {
   target: string;
@@ -175,7 +210,7 @@ function checkMatrix(packages: readonly WorkspacePackage[]): string[] {
       }
 
       if (!allowed.includes(dependency)) {
-        const explanation = RULE_EXPLANATIONS[dependency];
+        const explanation = explainForbiddenEdge(pkg.name, dependency);
         errors.push(
           `${pkg.name} may not depend on ${dependency}.\n` +
             `    Allowed: ${allowed.length > 0 ? allowed.join(', ') : '(leaf — nothing)'}\n` +
