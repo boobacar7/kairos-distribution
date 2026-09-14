@@ -96,7 +96,7 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                       <span className="bg-soft-green block h-[4.5rem] w-full rounded-lg md:h-[7.5rem] md:w-[7.5rem]" />
                     )}
                   </a>
-                  <div className="min-w-0 flex-1 pr-9 md:pr-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <a href={`/produit/${product.slug}`} className="min-w-0">
                         <h3 className="text-botanical text-caption leading-tight font-semibold md:text-body-sm">
@@ -120,17 +120,19 @@ export function FeaturedRow({ products }: { products: readonly FeaturedProduct[]
                         </span>
                       </p>
                     ) : null}
-                    <p className="text-botanical mt-1 text-caption whitespace-nowrap font-semibold md:text-body-sm">
-                      {formatPrice(product.price)}
-                    </p>
+                    <div className="mt-1 flex items-center gap-1">
+                      <p className="text-botanical min-w-0 text-caption leading-tight font-semibold md:text-body-sm">
+                        {formatPrice(product.price)}
+                      </p>
+                      <a
+                        href={`/produit/${product.slug}`}
+                        className="bg-botanical text-ivory inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full md:absolute md:top-1/2 md:right-0 md:h-8 md:w-8 md:-translate-y-1/2"
+                        aria-label={t('product.add', { name: product.name })}
+                      >
+                        <PlusGlyph className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                      </a>
+                    </div>
                   </div>
-                  <a
-                    href={`/produit/${product.slug}`}
-                    className="bg-botanical text-ivory absolute right-0 bottom-0 inline-flex h-7 w-7 items-center justify-center rounded-full md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:h-8 md:w-8"
-                    aria-label={t('product.add', { name: product.name })}
-                  >
-                    <PlusGlyph className="h-3.5 w-3.5" />
-                  </a>
                 </article>
               </li>
             );
