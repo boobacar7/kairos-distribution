@@ -2,36 +2,52 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "stream",
   "globalDependencies": ["tsconfig.json", ".npmrc", "pnpm-lock.yaml"],
-  "globalEnv": ["NODE_ENV", "CI", "DATABASE_URL", "SHADOW_DATABASE_URL", "DATABASE_APP_URL"],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI",
+    "DATABASE_URL",
+    "SHADOW_DATABASE_URL",
+    "DATABASE_APP_URL",
+    "KAIROS_API_URL",
+    "STOREFRONT_SITE_URL",
+    "STOREFRONT_REVALIDATE_SECRET",
+    "STOREFRONT_USE_TEST_CATALOGUE"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**",
+        "app/**",
         "theme/**",
         "tsconfig*.json",
         "package.json",
         "prisma/**",
-        "prisma.config.ts"
+        "prisma.config.ts",
+        "next.config.*",
+        "postcss.config.*"
       ],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**",
+        "app/**",
         "theme/**",
         "tsconfig*.json",
         "package.json",
         "prisma/**",
-        "prisma.config.ts"
+        "prisma.config.ts",
+        "next.config.*"
       ],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "test": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**",
+        "app/**",
         "theme/**",
         "tsconfig*.json",
         "package.json",
@@ -46,7 +62,10 @@
         "SHADOW_DATABASE_URL",
         "DATABASE_APP_URL",
         "SEED_ADMIN_EMAIL",
-        "SEED_ADMIN_PASSWORD"
+        "SEED_ADMIN_PASSWORD",
+        "KAIROS_API_URL",
+        "STOREFRONT_SITE_URL",
+        "STOREFRONT_USE_TEST_CATALOGUE"
       ]
     },
     "clean": {

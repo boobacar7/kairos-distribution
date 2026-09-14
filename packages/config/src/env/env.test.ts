@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EnvironmentValidationError, isProduction, parseEnv } from './index.js';
+import { EnvironmentValidationError, isProduction, parseEnv, parseStorefrontEnv } from './index.js';
 
 const validEnv = {
   DATABASE_URL: 'postgresql://kairos:kairos@localhost:5432/kairos_dev?schema=public',
@@ -46,5 +46,33 @@ describe('isProduction', () => {
     expect(isProduction({ NODE_ENV: 'production' })).toBe(true);
     expect(isProduction({ NODE_ENV: 'development' })).toBe(false);
     expect(isProduction({ NODE_ENV: 'test' })).toBe(false);
+  });
+});
+
+describe('parseStorefrontEnv', () => {
+  it('does not require DATABASE_URL', () => {
+    const env = parseStorefrontEnv({});
+    expect(env.NODE_ENV).toBe('development');
+    expect(env.KAIROS_API_URL).toBeUndefined();
+    expect(env.STOREFRONT_USE_TEST_CATALOGUE).toBe(false);
+    expect(env.STOREFRONT_SITE_URL).toBe('http://127.0.0.1:3000');
+  });
+
+  it('rejects a malformed API URL rather than calling it later', () => {
+    expect(() => parseStorefrontEnv({ KAIROS_API_URL: 'not-a-url' })).toThrow(
+      EnvironmentValidationError,
+    );
+  });
+
+  it('enables the [TEST] catalogue only for explicit true/1 flags', () => {
+    expect(
+      parseStorefrontEnv({ STOREFRONT_USE_TEST_CATALOGUE: 'true' }).STOREFRONT_USE_TEST_CATALOGUE,
+    ).toBe(true);
+    expect(
+      parseStorefrontEnv({ STOREFRONT_USE_TEST_CATALOGUE: '1' }).STOREFRONT_USE_TEST_CATALOGUE,
+    ).toBe(true);
+    expect(
+      parseStorefrontEnv({ STOREFRONT_USE_TEST_CATALOGUE: 'false' }).STOREFRONT_USE_TEST_CATALOGUE,
+    ).toBe(false);
   });
 });

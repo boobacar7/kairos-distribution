@@ -4,10 +4,13 @@ export {
   envSchema,
   nodeEnvSchema,
   parseEnv,
+  parseStorefrontEnv,
+  storefrontEnvSchema,
   isProduction,
   EnvironmentValidationError,
   type Env,
   type NodeEnv,
+  type StorefrontEnv,
 } from './env/index.js';
 
 export {

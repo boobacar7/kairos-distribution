@@ -1,0 +1,25 @@
+'use client';
+
+import { Alert, Button } from '@kairos/ui';
+
+import { t } from '../messages/t.js';
+
+export default function HomeError({
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <div className="px-gutter py-section mx-auto max-w-3xl">
+      <Alert tone="danger" title={t('errors.title')}>
+        <div className="space-y-3">
+          <p>{t('errors.home')}</p>
+          <Button variant="secondary" onClick={reset}>
+            {t('errors.retry')}
+          </Button>
+        </div>
+      </Alert>
+    </div>
+  );
+}

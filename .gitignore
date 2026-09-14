@@ -61,4 +61,7 @@ Thumbs.db
 # Misc
 .cache/
 tmp/
+
+# Generated font copies for storefront preload (source of truth is @fontsource)
+apps/storefront/public/fonts/
 packages/ui/gallery-dist/

@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@import '@kairos/config/theme';
+
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+@source './**/*.{ts,tsx}';
+@source '../**/*.{ts,tsx}';
