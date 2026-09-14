@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '@kairos/config/theme';
+
+@source './**/*.{ts,tsx}';
+@source '../gallery/**/*.{ts,tsx}';

@@ -1,0 +1,62 @@
+{
+  "name": "@kairos/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kairos design system. Presentational React primitives only: no data fetching, no validation, no business rules.",
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./primitives": {
+      "types": "./dist/primitives/index.d.ts",
+      "default": "./dist/primitives/index.js"
+    },
+    "./commerce": {
+      "types": "./dist/commerce/index.d.ts",
+      "default": "./dist/commerce/index.js"
+    },
+    "./styles": "./src/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src/styles.css"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build",
+    "test": "vitest run",
+    "clean": "tsc --build --clean",
+    "gallery": "vite --config vite.config.ts",
+    "gallery:build": "vite build --config vite.config.ts"
+  },
+  "dependencies": {
+    "@kairos/config": "workspace:*",
+    "@kairos/types": "workspace:*",
+    "tailwindcss": "4.3.3"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "axe-core": "4.13.0",
+    "jsdom": "26.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.0"
+  }
+}
