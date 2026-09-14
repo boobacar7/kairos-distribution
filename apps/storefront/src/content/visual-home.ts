@@ -10,13 +10,7 @@ import type { HomeContent, MediaRef } from './contract';
  * as soon as CMS/catalogue exist.
  */
 
-function media(
-  id: string,
-  url: string,
-  alt: string,
-  width: number,
-  height: number,
-): MediaRef {
+function media(id: string, url: string, alt: string, width: number, height: number): MediaRef {
   return { id, url, alt, width, height };
 }
 
@@ -188,15 +182,7 @@ export function buildVisualHome(): HomeContent {
       averageRating: 4.8,
       reviewCount: 500,
       additionalCount: 297,
-      avatars: [
-        media(
-          'avis-avatars',
-          '/media/review-avatars.jpg',
-          '',
-          150,
-          72,
-        ),
-      ],
+      avatars: [media('avis-avatars', '/media/review-avatars.jpg', '', 150, 72)],
     },
     banners: [
       {
@@ -208,13 +194,7 @@ export function buildVisualHome(): HomeContent {
         code: 'KAIROS10',
         ctaLabel: 'J’en profite maintenant',
         ctaUrl: '/boutique/promotions',
-        image: media(
-          'promo-leaf-left',
-          '/media/promo-leaf-left.jpg',
-          '',
-          154,
-          92,
-        ),
+        image: media('promo-leaf-left', '/media/promo-leaf-left.jpg', '', 154, 92),
         placement: 'HOMEPAGE_MID',
         isActive: true,
         position: 0,

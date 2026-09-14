@@ -16,7 +16,8 @@ const DESKTOP_NAV = [
 
 function navIsCurrent(key: (typeof DESKTOP_NAV)[number]['key'], pathname: string): boolean {
   if (key === 'nav.home') return pathname === '/';
-  if (key === 'nav.shop') return pathname.startsWith('/boutique') && pathname !== '/boutique/promotions';
+  if (key === 'nav.shop')
+    return pathname.startsWith('/boutique') && pathname !== '/boutique/promotions';
   if (key === 'nav.promotions') return pathname === '/boutique/promotions';
   return false;
 }

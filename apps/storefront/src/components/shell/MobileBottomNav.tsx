@@ -36,9 +36,7 @@ export function MobileBottomNav() {
                     : 'text-botanical/70 flex flex-col items-center gap-0.5 rounded-md px-1 py-2 text-caption font-medium'
                 }
               >
-                {item.icon === 'home' ? (
-                  <HomeGlyph filled={current} className="h-5 w-5" />
-                ) : null}
+                {item.icon === 'home' ? <HomeGlyph filled={current} className="h-5 w-5" /> : null}
                 {item.icon === 'shop' ? <ShopGlyph className="h-5 w-5" /> : null}
                 {item.icon === 'cart' ? <CartGlyph className="h-5 w-5" /> : null}
                 {item.icon === 'orders' ? <OrdersGlyph className="h-5 w-5" /> : null}

@@ -41,7 +41,9 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                   ) : null}
                   <h3 className="font-serif text-h3 text-botanical md:text-h2">
                     {banner.title}{' '}
-                    {banner.highlight ? <span className="text-coral">{banner.highlight}</span> : null}
+                    {banner.highlight ? (
+                      <span className="text-coral">{banner.highlight}</span>
+                    ) : null}
                   </h3>
                   {banner.subtitle ? (
                     <p className="text-botanical text-body-sm">{banner.subtitle}</p>
@@ -49,7 +51,8 @@ export function PromoSection({ banners }: { banners: readonly PromoBanner[] }) {
                 </div>
                 {banner.code ? (
                   <p className="border-beige bg-ivory text-botanical rounded-lg border px-4 py-3 text-center text-body-sm">
-                    {t('home.promoCode')} : <span className="font-semibold tracking-wide">{banner.code}</span>
+                    {t('home.promoCode')} :{' '}
+                    <span className="font-semibold tracking-wide">{banner.code}</span>
                   </p>
                 ) : null}
                 {banner.ctaLabel && banner.ctaUrl ? (

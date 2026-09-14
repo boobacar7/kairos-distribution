@@ -1,10 +1,6 @@
 import type { ReactNode, SVGProps } from 'react';
 
-function Icon({
-  children,
-  className,
-  ...rest
-}: SVGProps<SVGSVGElement> & { children: ReactNode }) {
+function Icon({ children, className, ...rest }: SVGProps<SVGSVGElement> & { children: ReactNode }) {
   return (
     <svg
       viewBox="0 0 24 24"

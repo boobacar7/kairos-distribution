@@ -40,7 +40,9 @@ describe('HomeView', () => {
     const content = publishedHome(buildVisualHome(), new Date());
     render(<HomeView content={content} />);
 
-    expect(screen.getByRole('heading', { name: 'Une beauté plus naturelle, au quotidien' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Une beauté plus naturelle, au quotidien' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Crème Éclat')).toBeInTheDocument();
     expect(screen.getByText('KAIROS10')).toBeInTheDocument();
     expect(screen.getByText('Soins')).toBeInTheDocument();

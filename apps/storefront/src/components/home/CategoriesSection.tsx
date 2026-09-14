@@ -5,12 +5,13 @@ import type { CategoryCard } from '../../content/contract';
 import { t } from '../../messages/t';
 import { CapsuleGlyph, CupGlyph, GiftGlyph, LeafGlyph } from '../shell/icons';
 
-const ICON_BY_SLUG: Record<string, { Icon: ComponentType<{ className?: string }>; tone: string }> = {
-  'beaute-soins': { Icon: LeafGlyph, tone: 'bg-soft-green text-botanical' },
-  'thes-infusions': { Icon: CupGlyph, tone: 'bg-beige text-botanical' },
-  capsules: { Icon: CapsuleGlyph, tone: 'bg-coral text-ink' },
-  packs: { Icon: GiftGlyph, tone: 'bg-powder-pink text-botanical' },
-};
+const ICON_BY_SLUG: Record<string, { Icon: ComponentType<{ className?: string }>; tone: string }> =
+  {
+    'beaute-soins': { Icon: LeafGlyph, tone: 'bg-soft-green text-botanical' },
+    'thes-infusions': { Icon: CupGlyph, tone: 'bg-beige text-botanical' },
+    capsules: { Icon: CapsuleGlyph, tone: 'bg-coral text-ink' },
+    packs: { Icon: GiftGlyph, tone: 'bg-powder-pink text-botanical' },
+  };
 
 export function CategoriesSection({ categories }: { categories: readonly CategoryCard[] }) {
   if (categories.length === 0) {
@@ -48,7 +49,9 @@ export function CategoriesSection({ categories }: { categories: readonly Categor
                     {category.name}
                   </span>
                   {category.subtitle ? (
-                    <span className="text-botanical/70 block text-caption">{category.subtitle}</span>
+                    <span className="text-botanical/70 block text-caption">
+                      {category.subtitle}
+                    </span>
                   ) : null}
                 </span>
               </a>

@@ -13,7 +13,10 @@ describe('storefront shell', () => {
     expect(screen.getAllByRole('link', { name: t('nav.shop') }).length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: t('nav.promotions') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.reviews') })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: t('nav.search') })).toHaveAttribute('href', '/boutique');
+    expect(screen.getByRole('link', { name: t('nav.search') })).toHaveAttribute(
+      'href',
+      '/boutique',
+    );
     expect(screen.getByRole('link', { name: t('cart.icon') })).toHaveAttribute('href', '/panier');
   });
 
@@ -26,7 +29,10 @@ describe('storefront shell', () => {
     render(<MobileBottomNav />);
     expect(screen.getByRole('navigation', { name: t('nav.mobile') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.cart') })).toHaveAttribute('href', '/panier');
-    expect(screen.getByRole('link', { name: t('nav.orders') })).toHaveAttribute('href', '/commandes');
+    expect(screen.getByRole('link', { name: t('nav.orders') })).toHaveAttribute(
+      'href',
+      '/commandes',
+    );
   });
 
   it('hides the cart count when empty', () => {

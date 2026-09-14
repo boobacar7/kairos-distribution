@@ -26,11 +26,7 @@ function StarRow({ value, label }: { value: number; label: string }) {
   );
 }
 
-export function FeaturedRow({
-  products,
-}: {
-  products: readonly FeaturedProduct[];
-}) {
+export function FeaturedRow({ products }: { products: readonly FeaturedProduct[] }) {
   if (products.length === 0) {
     return (
       <section
@@ -93,7 +89,9 @@ export function FeaturedRow({
                           {product.name}
                         </h3>
                         {product.subtitle ? (
-                          <p className="text-botanical/70 truncate text-caption">{product.subtitle}</p>
+                          <p className="text-botanical/70 truncate text-caption">
+                            {product.subtitle}
+                          </p>
                         ) : null}
                       </a>
                       {isTestDataName(product.name) ? (
@@ -102,10 +100,7 @@ export function FeaturedRow({
                     </div>
                     {rating !== undefined ? (
                       <p className="mt-0.5 flex flex-wrap items-center gap-1">
-                        <StarRow
-                          value={rating}
-                          label={t('reviews.rating', { value: rating })}
-                        />
+                        <StarRow value={rating} label={t('reviews.rating', { value: rating })} />
                         <span className="text-botanical/70 text-caption">
                           {t('product.stars', { count: product.reviewCount ?? 0 })}
                         </span>
