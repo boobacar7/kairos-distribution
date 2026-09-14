@@ -19,7 +19,7 @@
 .home-hero [data-surface='inverse'] .relative.min-h-72,
 .home-hero [data-surface='inverse'] .relative.min-h-72 > .flex {
   /* ~2:1 so the mobile hero crop is not side-clipped */
-  min-height: 10.25rem;
+  min-height: 9.5rem;
 }
 
 @media (min-width: 48rem) {
