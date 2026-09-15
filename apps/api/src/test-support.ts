@@ -161,3 +161,51 @@ export async function createPublicProduct(
 export async function deleteProduct(client: PrismaClient, productId: string): Promise<void> {
   await client.product.delete({ where: { id: productId } }).catch(() => undefined);
 }
+
+export async function createActiveDelivery(
+  client: PrismaClient,
+  options: { fee?: number; city?: string } = {},
+): Promise<{ zoneId: string; methodId: string; fee: number }> {
+  const id = suffix();
+  const fee = options.fee ?? 1500;
+  const zone = await client.deliveryZone.create({
+    data: {
+      name: `[TEST] zone ${id}`,
+      slug: `test-zone-${id}`,
+      city: options.city ?? 'Ouagadougou',
+      countryCode: 'BF',
+      isActive: true,
+      position: 0,
+    },
+  });
+  const method = await client.deliveryMethod.create({
+    data: {
+      zoneId: zone.id,
+      code: `STD-${id.slice(0, 6)}`,
+      name: 'Standard',
+      fee,
+      estimatedMinHours: 24,
+      estimatedMaxHours: 72,
+      isActive: true,
+      position: 0,
+    },
+  });
+  return { zoneId: zone.id, methodId: method.id, fee };
+}
+
+export async function createCustomer(
+  client: PrismaClient,
+  options: { verified?: boolean; email?: string } = {},
+): Promise<{ id: string; email: string }> {
+  const id = suffix();
+  const email = options.email ?? `customer-${id}@example.test`;
+  const customer = await client.customer.create({
+    data: {
+      email,
+      firstName: 'Test',
+      lastName: 'Customer',
+      emailVerifiedAt: options.verified === false ? null : new Date(),
+    },
+  });
+  return { id: customer.id, email };
+}

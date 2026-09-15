@@ -21,14 +21,15 @@ async function createGuestOrder(options: {
   expiresAt?: Date;
   deliveredAt?: Date | null;
   reference?: string;
-}): Promise<{ id: string; reference: string }> {
+}): Promise<{ id: string; reference: string; email: string }> {
   const prisma = testPrisma();
   const id = suffix();
   const reference = options.reference ?? `KD-2026-${id.slice(0, 6)}`;
+  const email = `guest-${id}@example.test`;
   const order = await prisma.order.create({
     data: {
       reference,
-      email: `guest-${id}@example.test`,
+      email,
       phone: '+22670000000',
       firstName: 'Guest',
       lastName: 'Order',
@@ -43,7 +44,7 @@ async function createGuestOrder(options: {
       deliveredAt: options.deliveredAt ?? null,
     },
   });
-  return { id: order.id, reference: order.reference };
+  return { id: order.id, reference: order.reference, email: order.email };
 }
 
 describe('guest-order security', () => {
@@ -78,8 +79,8 @@ describe('guest-order security', () => {
 
   it('is single-use: a second claim with the same token fails', async () => {
     const token = generateGuestClaimToken();
-    const { id } = await createGuestOrder({ token });
-    const customer = await createCustomer(testPrisma(), { verified: true });
+    const { id, email } = await createGuestOrder({ token });
+    const customer = await createCustomer(testPrisma(), { verified: true, email });
     const prisma = testPrisma();
 
     await prisma.$transaction((tx) =>
@@ -101,8 +102,8 @@ describe('guest-order security', () => {
 
   it('rejects claim by an unverified customer (trigger, not just the service)', async () => {
     const token = generateGuestClaimToken();
-    const { id } = await createGuestOrder({ token });
-    const unverified = await createCustomer(testPrisma(), { verified: false });
+    const { id, email } = await createGuestOrder({ token });
+    const unverified = await createCustomer(testPrisma(), { verified: false, email });
 
     await expect(
       testPrisma().$transaction((tx) =>
@@ -113,11 +114,11 @@ describe('guest-order security', () => {
 
   it('rejects an expired token without linking', async () => {
     const token = generateGuestClaimToken();
-    const { id } = await createGuestOrder({
+    const { id, email } = await createGuestOrder({
       token,
       expiresAt: new Date(Date.now() - 1000),
     });
-    const customer = await createCustomer(testPrisma(), { verified: true });
+    const customer = await createCustomer(testPrisma(), { verified: true, email });
     await expect(
       testPrisma().$transaction((tx) =>
         claimGuestOrder(tx, { orderId: id, token, customerId: customer.id }),
@@ -128,8 +129,8 @@ describe('guest-order security', () => {
   });
 
   it('rejects a wrong token without distinguishing the failure mode', async () => {
-    const { id } = await createGuestOrder({ token: generateGuestClaimToken() });
-    const customer = await createCustomer(testPrisma(), { verified: true });
+    const { id, email } = await createGuestOrder({ token: generateGuestClaimToken() });
+    const customer = await createCustomer(testPrisma(), { verified: true, email });
     await expect(
       testPrisma().$transaction((tx) =>
         claimGuestOrder(tx, {
@@ -139,5 +140,19 @@ describe('guest-order security', () => {
         }),
       ),
     ).rejects.toBeInstanceOf(GuestClaimError);
+  });
+
+  it('rejects a verified customer whose email does not match the order', async () => {
+    const token = generateGuestClaimToken();
+    const { id } = await createGuestOrder({ token });
+    const stranger = await createCustomer(testPrisma(), { verified: true });
+    await expect(
+      testPrisma().$transaction((tx) =>
+        claimGuestOrder(tx, { orderId: id, token, customerId: stranger.id }),
+      ),
+    ).rejects.toBeInstanceOf(GuestClaimError);
+    const row = await testPrisma().order.findUniqueOrThrow({ where: { id } });
+    expect(row.customerId).toBeNull();
+    expect(row.guestClaimTokenHash).not.toBeNull();
   });
 });

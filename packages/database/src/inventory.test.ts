@@ -4,6 +4,9 @@ import {
   InventoryInconsistencyError,
   OutOfStockError,
   Prisma,
+  consumeTrackedStock,
+  expireTrackedStock,
+  releaseTrackedStock,
   reserveTrackedStock,
   withInventoryTransaction,
 } from './index.js';
@@ -192,5 +195,145 @@ describe('inventory concurrency', () => {
 
   it('uses the Prisma ReadCommitted enum (not a raised isolation level)', () => {
     expect(Prisma.TransactionIsolationLevel.ReadCommitted).toBe('ReadCommitted');
+  });
+});
+
+describe('inventory release / expire / consume', () => {
+  beforeAll(async () => {
+    await ensureSeeded();
+  });
+
+  afterAll(async () => {
+    await disconnectTestPrisma();
+  });
+
+  it('releases reserved units without changing on-hand', async () => {
+    const { inventoryItemId } = await createTrackedVariant(testPrisma(), { onHand: 2 });
+    const prisma = testPrisma();
+    await withInventoryTransaction({ prisma }, async (tx) => {
+      await reserveTrackedStock(tx, {
+        inventoryItemId,
+        quantity: 1,
+        idempotencyKey: `reserve-rel:${inventoryItemId}`,
+      });
+      await releaseTrackedStock(tx, {
+        inventoryItemId,
+        quantity: 1,
+        idempotencyKey: `release:${inventoryItemId}`,
+      });
+    });
+    const item = await prisma.inventoryItem.findUniqueOrThrow({ where: { id: inventoryItemId } });
+    expect(item.onHandQty).toBe(2);
+    expect(item.reservedQty).toBe(0);
+    expect(item.availableQty).toBe(2);
+  });
+
+  it('expires a held reservation past expiresAt and is idempotent', async () => {
+    const created = await createTrackedVariant(testPrisma(), { onHand: 1 });
+    const prisma = testPrisma();
+    const reservation = await prisma.stockReservation.create({
+      data: {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        status: 'HELD',
+        expiresAt: new Date(Date.now() - 1000),
+      },
+    });
+    await withInventoryTransaction({ prisma }, async (tx) => {
+      await reserveTrackedStock(tx, {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        idempotencyKey: `reserve-exp:${created.inventoryItemId}`,
+        reservationId: reservation.id,
+      });
+    });
+    await prisma.stockReservation.update({
+      where: { id: reservation.id },
+      data: { expiresAt: new Date(Date.now() - 1000) },
+    });
+
+    const first = await withInventoryTransaction({ prisma }, async (tx) =>
+      expireTrackedStock(tx, {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        reservationId: reservation.id,
+        idempotencyKey: `expire:${reservation.id}`,
+      }),
+    );
+    expect(first).not.toBe('duplicate');
+    expect(first).not.toBe('not_due');
+
+    const second = await withInventoryTransaction({ prisma }, async (tx) =>
+      expireTrackedStock(tx, {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        reservationId: reservation.id,
+        idempotencyKey: `expire:${reservation.id}`,
+      }),
+    );
+    expect(second).toBe('duplicate');
+
+    const item = await prisma.inventoryItem.findUniqueOrThrow({
+      where: { id: created.inventoryItemId },
+    });
+    expect(item.reservedQty).toBe(0);
+    expect(item.availableQty).toBe(1);
+    const row = await prisma.stockReservation.findUniqueOrThrow({ where: { id: reservation.id } });
+    expect(row.status).toBe('EXPIRED');
+  });
+
+  it('does not expire a reservation whose pending hold was extended', async () => {
+    const created = await createTrackedVariant(testPrisma(), { onHand: 1 });
+    const prisma = testPrisma();
+    const reservation = await prisma.stockReservation.create({
+      data: {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        status: 'HELD',
+        expiresAt: new Date(Date.now() + 60 * 60_000),
+      },
+    });
+    await withInventoryTransaction({ prisma }, async (tx) => {
+      await reserveTrackedStock(tx, {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        idempotencyKey: `reserve-held:${created.inventoryItemId}`,
+        reservationId: reservation.id,
+      });
+    });
+    const result = await withInventoryTransaction({ prisma }, async (tx) =>
+      expireTrackedStock(tx, {
+        inventoryItemId: created.inventoryItemId,
+        quantity: 1,
+        reservationId: reservation.id,
+        idempotencyKey: `expire:${reservation.id}`,
+      }),
+    );
+    expect(result).toBe('not_due');
+    const item = await prisma.inventoryItem.findUniqueOrThrow({
+      where: { id: created.inventoryItemId },
+    });
+    expect(item.reservedQty).toBe(1);
+  });
+
+  it('consumes reserved stock by decrementing on-hand and reserved together', async () => {
+    const { inventoryItemId } = await createTrackedVariant(testPrisma(), { onHand: 3 });
+    const prisma = testPrisma();
+    await withInventoryTransaction({ prisma }, async (tx) => {
+      await reserveTrackedStock(tx, {
+        inventoryItemId,
+        quantity: 2,
+        idempotencyKey: `reserve-c:${inventoryItemId}`,
+      });
+      await consumeTrackedStock(tx, {
+        inventoryItemId,
+        quantity: 2,
+        idempotencyKey: `fulfil:${inventoryItemId}`,
+      });
+    });
+    const item = await prisma.inventoryItem.findUniqueOrThrow({ where: { id: inventoryItemId } });
+    expect(item.onHandQty).toBe(1);
+    expect(item.reservedQty).toBe(0);
+    expect(item.availableQty).toBe(1);
   });
 });

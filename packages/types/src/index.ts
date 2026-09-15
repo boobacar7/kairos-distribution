@@ -4,3 +4,6 @@ export * from './order-status/index.js';
 export * from './permissions/index.js';
 export * from './registry/index.js';
 export * from './tax/index.js';
+export * from './payment/index.js';
+export * from './delivery/index.js';
+export * from './inventory/index.js';

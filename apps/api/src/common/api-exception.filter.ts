@@ -6,13 +6,22 @@ import {
   type ExceptionFilter,
 } from '@nestjs/common';
 import { ZodError } from 'zod';
+import { InventoryInconsistencyError } from '@kairos/database';
 
 import { CatalogInconsistentError } from '../catalog/catalog.errors.js';
+import {
+  CheckoutConflictError,
+  GuestClaimRejectedError,
+  IdempotencyConflictError,
+  PaidWithoutStockError,
+} from '../checkout/checkout.errors.js';
 
 export type ApiErrorBody = {
   statusCode: number;
   code: string;
   message: string;
+  issues?: Array<{ code: string; variantId?: string | undefined; message: string }>;
+  incident?: string;
 };
 
 @Catch()
@@ -31,13 +40,79 @@ export class ApiExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    if (exception instanceof CatalogInconsistentError) {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        code: 'CATALOG_INCONSISTENT',
-        message: 'Données catalogue incohérentes.',
+    if (exception instanceof CheckoutConflictError) {
+      response.status(HttpStatus.CONFLICT).json({
+        statusCode: HttpStatus.CONFLICT,
+        code:
+          exception instanceof Error && exception.name === 'DeliveryUnavailableError'
+            ? 'DELIVERY_UNAVAILABLE'
+            : 'CHECKOUT_CONFLICT',
+        message: exception.message,
+        issues: exception.issues,
       });
       return;
+    }
+
+    if (exception instanceof IdempotencyConflictError) {
+      response.status(HttpStatus.CONFLICT).json({
+        statusCode: HttpStatus.CONFLICT,
+        code: exception.code,
+        message:
+          exception.code === 'IDEMPOTENCY_IN_PROGRESS'
+            ? 'Requête déjà en cours.'
+            : 'Clé d’idempotence réutilisée avec un autre contenu.',
+      });
+      return;
+    }
+
+    if (exception instanceof GuestClaimRejectedError) {
+      response.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        code: 'CLAIM_FAILED',
+        message: 'Impossible de rattacher cette commande.',
+      });
+      return;
+    }
+
+    if (exception instanceof PaidWithoutStockError) {
+      response.status(HttpStatus.CONFLICT).json({
+        statusCode: HttpStatus.CONFLICT,
+        code: 'PAID_WITHOUT_STOCK',
+        message: 'Paiement enregistré sans stock — remboursement requis.',
+        incident: 'payments.paid_without_stock',
+      });
+      return;
+    }
+
+    if (
+      exception instanceof CatalogInconsistentError ||
+      exception instanceof InventoryInconsistencyError
+    ) {
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        code: 'INVENTORY_INCONSISTENT',
+        message: 'Données de stock incohérentes.',
+      });
+      return;
+    }
+
+    if (exception instanceof Error && 'code' in exception && typeof exception.code === 'string') {
+      if (exception.code === 'ORDER_NOT_FOUND' || exception.code === 'CART_NOT_FOUND') {
+        response.status(HttpStatus.NOT_FOUND).json({
+          statusCode: HttpStatus.NOT_FOUND,
+          code: 'NOT_FOUND',
+          message: 'Introuvable.',
+        });
+        return;
+      }
+      if (exception.code === 'ORDER_NOT_PAYABLE' || exception.code === 'PROVIDER_INACTIVE') {
+        response.status(HttpStatus.CONFLICT).json({
+          statusCode: HttpStatus.CONFLICT,
+          code: exception.code,
+          message: 'Paiement impossible.',
+        });
+        return;
+      }
     }
 
     if (exception instanceof HttpException) {

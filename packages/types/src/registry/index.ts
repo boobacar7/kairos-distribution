@@ -84,11 +84,17 @@ export const SEGMENT_THRESHOLD_DEFAULTS = {
 export const INVENTORY_SETTING_KEYS = {
   RESERVATION_TTL_MINUTES: 'inventory.reservationTtlMinutes',
   DEFAULT_LOW_STOCK_THRESHOLD: 'inventory.defaultLowStockThreshold',
+  PAYMENT_PENDING_HOLD_MINUTES: 'inventory.paymentPendingHoldMinutes',
+  RESERVATION_ABSOLUTE_CAP_MINUTES: 'inventory.reservationAbsoluteCapMinutes',
 } as const;
 
 export const INVENTORY_SETTING_DEFAULTS = {
   [INVENTORY_SETTING_KEYS.RESERVATION_TTL_MINUTES]: 15,
   [INVENTORY_SETTING_KEYS.DEFAULT_LOW_STOCK_THRESHOLD]: 5,
+  /** Interactive pending cap (Kairos rule). Independent of any provider invoice TTL. */
+  [INVENTORY_SETTING_KEYS.PAYMENT_PENDING_HOLD_MINUTES]: 60,
+  /** Absolute stock hold from placement. Never null, never infinite. */
+  [INVENTORY_SETTING_KEYS.RESERVATION_ABSOLUTE_CAP_MINUTES]: 60,
 } as const;
 
 export const CART_SETTING_KEYS = {

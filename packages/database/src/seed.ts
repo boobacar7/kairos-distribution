@@ -444,7 +444,7 @@ export async function seedReference(prisma: PrismaClient): Promise<void> {
       create: {
         key,
         displayName: seed.displayName,
-        isActive: false,
+        isActive: key === 'manual',
         position: seed.position,
         capabilities: seed.capabilities,
         publicConfig: seed.publicConfig,
@@ -456,6 +456,7 @@ export async function seedReference(prisma: PrismaClient): Promise<void> {
         capabilities: seed.capabilities,
         publicConfig: seed.publicConfig,
         secretRef: seed.secretRef,
+        ...(key === 'manual' ? { isActive: true } : {}),
       },
     });
   }
@@ -470,6 +471,16 @@ export async function seedReference(prisma: PrismaClient): Promise<void> {
       key: INVENTORY_SETTING_KEYS.DEFAULT_LOW_STOCK_THRESHOLD,
       group: 'inventory',
       value: INVENTORY_SETTING_DEFAULTS[INVENTORY_SETTING_KEYS.DEFAULT_LOW_STOCK_THRESHOLD],
+    },
+    {
+      key: INVENTORY_SETTING_KEYS.PAYMENT_PENDING_HOLD_MINUTES,
+      group: 'inventory',
+      value: INVENTORY_SETTING_DEFAULTS[INVENTORY_SETTING_KEYS.PAYMENT_PENDING_HOLD_MINUTES],
+    },
+    {
+      key: INVENTORY_SETTING_KEYS.RESERVATION_ABSOLUTE_CAP_MINUTES,
+      group: 'inventory',
+      value: INVENTORY_SETTING_DEFAULTS[INVENTORY_SETTING_KEYS.RESERVATION_ABSOLUTE_CAP_MINUTES],
     },
     {
       key: CART_SETTING_KEYS.TTL_DAYS,

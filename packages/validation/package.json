@@ -23,6 +23,10 @@
       "types": "./dist/cart/index.d.ts",
       "default": "./dist/cart/index.js"
     },
+    "./checkout": {
+      "types": "./dist/checkout/index.d.ts",
+      "default": "./dist/checkout/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
