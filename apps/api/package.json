@@ -10,6 +10,7 @@
     "build": "tsc --build",
     "start": "node dist/main.js",
     "typecheck": "tsc --build --pretty false",
+    "lint": "pnpm -w exec eslint apps/api",
     "test": "vitest run",
     "clean": "tsc --build --clean"
   },

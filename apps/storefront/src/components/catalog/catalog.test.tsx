@@ -88,6 +88,19 @@ describe('BoutiqueView', () => {
     expect(screen.getByText(t('cart.added'))).toBeInTheDocument();
   });
 
+  it('shows an empty catalogue state when the API returns no products', () => {
+    render(
+      <BoutiqueView
+        title={t('pages.shop.title')}
+        categories={categories}
+        products={{ data: [], meta: { page: 1, limit: 24, total: 0, pageCount: 0 } }}
+        query={query}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: t('empty.products') })).toBeInTheDocument();
+    expect(screen.queryByText(t('errors.catalog'))).not.toBeInTheDocument();
+  });
+
   it('shows an empty state when the catalogue has no matching products', () => {
     render(
       <BoutiqueView
