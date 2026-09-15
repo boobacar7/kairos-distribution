@@ -116,6 +116,7 @@ export const messages = {
   'catalog.viewProduct': 'Voir {name}',
 
   'errors.title': 'Une erreur est survenue',
+  'errors.global': 'L’application a rencontré une erreur. Réessayez.',
   'errors.home': 'Le contenu de la page d’accueil est indisponible. Réessayez.',
   'errors.catalog': 'Le catalogue est indisponible. Réessayez.',
   'errors.retry': 'Réessayer',
