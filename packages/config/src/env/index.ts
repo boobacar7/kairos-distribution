@@ -40,12 +40,15 @@ export type Env = z.infer<typeof envSchema>;
  * Storefront process env. Intentionally separate from `envSchema`: the Next app must never
  * require `DATABASE_URL` (architecture.md §3.2 — Prisma is API-only).
  *
- * `KAIROS_API_URL` is optional until BACKEND/CMS land. When it is unset the storefront consumes
- * the approved visual homepage stub (or the labelled `[TEST]` catalogue when that flag is on).
- * Empty CMS payloads still render per-section empty states.
+ * `KAIROS_API_URL` is optional so the homepage can keep the visual stub until CMS
+ * `GET /v1/content/home` exists. An empty string is treated as unset. Catalogue SSR in
+ * non-production still defaults to `http://127.0.0.1:4000` (see storefront `catalog/api-url.ts`).
  */
 export const storefrontEnvSchema = baseEnvSchema.extend({
-  KAIROS_API_URL: z.string().url().optional(),
+  KAIROS_API_URL: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().url().optional(),
+  ),
   STOREFRONT_SITE_URL: z.string().url().default('http://127.0.0.1:3000'),
   STOREFRONT_REVALIDATE_SECRET: z.string().min(16).optional(),
   STOREFRONT_USE_TEST_CATALOGUE: z

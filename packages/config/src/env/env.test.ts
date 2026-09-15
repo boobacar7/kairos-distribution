@@ -64,6 +64,11 @@ describe('parseStorefrontEnv', () => {
     expect(env.STOREFRONT_SITE_URL).toBe('http://127.0.0.1:3000');
   });
 
+  it('treats an empty KAIROS_API_URL as unset rather than invalid', () => {
+    expect(parseStorefrontEnv({ KAIROS_API_URL: '' }).KAIROS_API_URL).toBeUndefined();
+    expect(parseStorefrontEnv({ KAIROS_API_URL: '   ' }).KAIROS_API_URL).toBeUndefined();
+  });
+
   it('rejects a malformed API URL rather than calling it later', () => {
     expect(() => parseStorefrontEnv({ KAIROS_API_URL: 'not-a-url' })).toThrow(
       EnvironmentValidationError,

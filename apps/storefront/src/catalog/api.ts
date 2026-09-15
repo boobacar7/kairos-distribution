@@ -13,16 +13,17 @@ import {
   type ProductListResponse,
 } from '@kairos/validation/catalog';
 
+import { resolveCatalogApiOrigin } from './api-url';
 import { CatalogNotFoundError, CatalogUnavailableError } from './errors';
 
 export const CATALOG_REVALIDATE_SECONDS = 300;
 
 function apiBaseUrl(): string {
-  const env = parseStorefrontEnv(process.env);
-  if (!env.KAIROS_API_URL) {
+  const origin = resolveCatalogApiOrigin(parseStorefrontEnv(process.env));
+  if (!origin) {
     throw new CatalogUnavailableError();
   }
-  return env.KAIROS_API_URL;
+  return origin;
 }
 
 async function apiGet(path: string, tags: string[]): Promise<unknown> {
@@ -33,7 +34,10 @@ async function apiGet(path: string, tags: string[]): Promise<unknown> {
       headers: { Accept: 'application/json' },
       next: { revalidate: CATALOG_REVALIDATE_SECONDS, tags },
     });
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`[catalog] GET ${url.href} failed`, error);
+    }
     throw new CatalogUnavailableError();
   }
   if (response.status === 404) {
@@ -42,7 +46,11 @@ async function apiGet(path: string, tags: string[]): Promise<unknown> {
   if (!response.ok) {
     throw new CatalogUnavailableError();
   }
-  return response.json();
+  try {
+    return await response.json();
+  } catch {
+    throw new CatalogUnavailableError();
+  }
 }
 
 export async function loadCategories(): Promise<CatalogCategory[]> {

@@ -1,8 +1,45 @@
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_DEV_CATALOG_API_ORIGIN, resolveCatalogApiOrigin } from './api-url';
 import { prepareAddToCart } from './cart-seam';
 import { boutiqueHref } from './href';
 import { productJsonLd } from './json-ld';
+
+describe('resolveCatalogApiOrigin', () => {
+  it('defaults to loopback IPv4 in development when KAIROS_API_URL is unset', () => {
+    expect(resolveCatalogApiOrigin({ NODE_ENV: 'development' })).toBe(
+      DEFAULT_DEV_CATALOG_API_ORIGIN,
+    );
+    expect(resolveCatalogApiOrigin({ NODE_ENV: 'test', KAIROS_API_URL: '' })).toBe(
+      DEFAULT_DEV_CATALOG_API_ORIGIN,
+    );
+  });
+
+  it('does not invent a loopback origin in production', () => {
+    expect(resolveCatalogApiOrigin({ NODE_ENV: 'production' })).toBeUndefined();
+    expect(
+      resolveCatalogApiOrigin({ NODE_ENV: 'production', KAIROS_API_URL: '  ' }),
+    ).toBeUndefined();
+  });
+
+  it('rewrites localhost to 127.0.0.1 so SSR fetch does not hit IPv6 ::1', () => {
+    expect(
+      resolveCatalogApiOrigin({
+        NODE_ENV: 'production',
+        KAIROS_API_URL: 'http://localhost:4000',
+      }),
+    ).toBe('http://127.0.0.1:4000');
+  });
+
+  it('keeps an explicit IPv4 origin', () => {
+    expect(
+      resolveCatalogApiOrigin({
+        NODE_ENV: 'production',
+        KAIROS_API_URL: 'http://127.0.0.1:4000/',
+      }),
+    ).toBe('http://127.0.0.1:4000');
+  });
+});
 
 describe('prepareAddToCart', () => {
   it('adds a valid variant to the guest cart', () => {
