@@ -68,9 +68,24 @@ describe('BoutiqueView', () => {
     expect(screen.getByText('[TEST] Crème')).toBeInTheDocument();
     expect(screen.getAllByText('Capsules').length).toBeGreaterThan(0);
     expect(screen.getByText(/5\s?000 FCFA/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t('catalog.addToCart') })).toBeInTheDocument();
     expect(screen.queryByText(/avis/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/miracle/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/\d+ en stock/i)).not.toBeInTheDocument();
+  });
+
+  it('adds a purchasable card variant to the guest cart', async () => {
+    const user = userEvent.setup();
+    render(
+      <BoutiqueView
+        title={t('pages.shop.title')}
+        categories={categories}
+        products={listResponse()}
+        query={query}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: t('catalog.addToCart') }));
+    expect(screen.getByText(t('cart.added'))).toBeInTheDocument();
   });
 
   it('shows an empty state when the catalogue has no matching products', () => {
@@ -132,8 +147,9 @@ describe('BoutiqueView', () => {
       />,
     );
     expect(screen.getByText('[TEST] Sans variante')).toBeInTheDocument();
-    expect(screen.getByRole('status')).toHaveTextContent(t('catalog.inconsistent'));
+    expect(screen.getByText(t('catalog.inconsistent'))).toBeInTheDocument();
     expect(screen.queryByText(/\d[\d\s]*FCFA/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t('catalog.addToCart') })).not.toBeInTheDocument();
   });
 });
 
@@ -176,11 +192,11 @@ describe('ProductDetailView', () => {
     expect(screen.getByText(/TEST-SKU-1/)).toBeInTheDocument();
   });
 
-  it('documents the cart seam instead of adding a line', async () => {
+  it('adds the product to the guest cart from the PDP', async () => {
     const user = userEvent.setup();
     render(<ProductDetailView product={product} />);
     await user.click(screen.getByRole('button', { name: t('catalog.addToCart') }));
-    expect(screen.getByText(t('catalog.cartPending'))).toBeInTheDocument();
+    expect(screen.getByText(t('cart.added'))).toBeInTheDocument();
   });
 
   it('surfaces an inventory inconsistency without calling it out of stock', () => {

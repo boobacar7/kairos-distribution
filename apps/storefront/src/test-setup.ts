@@ -2,8 +2,11 @@ import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 
+import { resetGuestCartForTests } from './cart/guest-cart';
+
 afterEach(() => {
   cleanup();
+  resetGuestCartForTests();
 });
 
 vi.mock('next/navigation', () => ({

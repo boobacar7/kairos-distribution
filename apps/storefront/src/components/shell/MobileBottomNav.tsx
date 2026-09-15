@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
+import { useOptionalCart } from '../../cart/cart-provider';
 import { t } from '../../messages/t';
 import { AccountGlyph, CartGlyph, HomeGlyph, OrdersGlyph, ShopGlyph } from './icons';
 
@@ -13,18 +14,11 @@ const ITEMS = [
   { href: '/compte', key: 'nav.account' as const, icon: 'account' },
 ] as const;
 
-export function MobileBottomNav({
-  cartCount = 0,
-  demoCart = false,
-}: {
-  cartCount?: number;
-  demoCart?: boolean;
-}) {
+export function MobileBottomNav({ cartCount }: { cartCount?: number }) {
   const pathname = usePathname();
-  const cartLabel =
-    cartCount > 0
-      ? t(demoCart ? 'cart.demoCount' : 'cart.count', { count: cartCount })
-      : t('nav.cart');
+  const cart = useOptionalCart();
+  const count = cart?.itemCount ?? cartCount ?? 0;
+  const cartLabel = count > 0 ? t('cart.count', { count }) : t('nav.cart');
 
   return (
     <nav
@@ -53,12 +47,12 @@ export function MobileBottomNav({
                 {item.icon === 'cart' ? (
                   <span className="relative inline-flex">
                     <CartGlyph className="h-5 w-5" />
-                    {cartCount > 0 ? (
+                    {count > 0 ? (
                       <span
                         className="bg-coral text-ink absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.625rem] font-semibold"
                         aria-hidden="true"
                       >
-                        {cartCount}
+                        {count}
                       </span>
                     ) : null}
                   </span>

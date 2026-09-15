@@ -41,19 +41,15 @@ describe('storefront shell', () => {
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 
-  it('shows the [TEST] demo badge of 3 from the approved frame', () => {
-    render(<CartIcon count={3} demo />);
-    expect(
-      screen.getByRole('link', { name: t('cart.demoCount', { count: 3 }) }),
-    ).toBeInTheDocument();
+  it('shows the real cart badge count', () => {
+    render(<CartIcon count={3} />);
+    expect(screen.getByRole('link', { name: t('cart.count', { count: 3 }) })).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('shows the demo cart badge on the mobile panier tab', () => {
-    render(<MobileBottomNav cartCount={3} demoCart />);
-    expect(
-      screen.getByRole('link', { name: t('cart.demoCount', { count: 3 }) }),
-    ).toBeInTheDocument();
+  it('shows the cart badge on the mobile panier tab', () => {
+    render(<MobileBottomNav cartCount={3} />);
+    expect(screen.getByRole('link', { name: t('cart.count', { count: 3 }) })).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 });

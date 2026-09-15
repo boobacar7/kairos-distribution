@@ -19,6 +19,7 @@ export function AddToCartPanel({
 }) {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
+  const [tone, setTone] = useState<'success' | 'danger'>('success');
 
   return (
     <div className="space-y-3">
@@ -36,10 +37,12 @@ export function AddToCartPanel({
         disabled={!purchasable}
         onClick={() => {
           const result = prepareAddToCart({ variantId: variantId ?? '', quantity });
-          if (result.code === 'CART_NOT_IMPLEMENTED') {
-            setMessage(t('catalog.cartPending'));
+          if (result.ok) {
+            setTone('success');
+            setMessage(t('cart.added'));
             return;
           }
+          setTone('danger');
           setMessage(t('catalog.unavailable'));
         }}
       >
@@ -51,7 +54,7 @@ export function AddToCartPanel({
         <Alert tone="warning">{t('catalog.inventoryError')}</Alert>
       ) : null}
       {message ? (
-        <Alert tone="info">
+        <Alert tone={tone}>
           <p role="status">{message}</p>
         </Alert>
       ) : null}
