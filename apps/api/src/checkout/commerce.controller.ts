@@ -38,6 +38,7 @@ export class CommerceController {
   ) {}
 
   @Post('payments/:orderRef/initiate')
+  @HttpCode(HttpStatus.OK)
   async initiate(
     @Param('orderRef') orderRef: string,
     @Body() body: unknown,
@@ -64,6 +65,7 @@ export class CommerceController {
   }
 
   @Post('admin/orders/:ref/mark-paid')
+  @HttpCode(HttpStatus.OK)
   async markPaid(
     @Param('ref') ref: string,
     @Body() body: unknown,
@@ -86,6 +88,7 @@ export class CommerceController {
   }
 
   @Post('admin/inventory/:variantId/adjust')
+  @HttpCode(HttpStatus.OK)
   async adjust(
     @Param('variantId') variantId: string,
     @Body() body: unknown,
