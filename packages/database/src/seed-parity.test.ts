@@ -84,7 +84,10 @@ describe('seeded-key parity', () => {
 
     const providers = await prisma.paymentProviderConfig.findMany();
     expect(providers.map((row) => row.key).sort()).toEqual([...PAYMENT_PROVIDER_KEYS].sort());
-    expect(providers.every((row) => row.isActive === false)).toBe(true);
+    const byKey = Object.fromEntries(providers.map((row) => [row.key, row.isActive]));
+    expect(byKey['manual']).toBe(true);
+    expect(byKey['mobile_money']).toBe(false);
+    expect(byKey['stripe']).toBe(false);
 
     const sections = await prisma.homepageSectionSetting.findMany();
     expect(sections.map((row) => row.key).sort()).toEqual([...HOMEPAGE_SECTION_KEYS].sort());

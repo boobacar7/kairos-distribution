@@ -74,11 +74,11 @@ export interface ReserveStockInput {
   inventoryItemId: string;
   quantity: number;
   idempotencyKey: string;
-  orderId?: string;
-  reservationId?: string;
+  orderId?: string | undefined;
+  reservationId?: string | undefined;
 }
 
-interface InventoryRow {
+export interface InventoryRow {
   id: string;
   onHandQty: number;
   reservedQty: number;
@@ -146,4 +146,291 @@ export async function reserveTrackedStock(
     );
   }
   throw new OutOfStockError(input.inventoryItemId, input.quantity);
+}
+
+export interface ReleaseStockInput {
+  inventoryItemId: string;
+  quantity: number;
+  idempotencyKey: string;
+  orderId?: string | undefined;
+  reservationId?: string | undefined;
+}
+
+export interface ExpireStockInput extends ReleaseStockInput {
+  reservationId: string;
+}
+
+export interface ConsumeStockInput {
+  inventoryItemId: string;
+  quantity: number;
+  idempotencyKey: string;
+  orderId?: string | undefined;
+  reservationId?: string | undefined;
+}
+
+async function loadMovement(
+  tx: Prisma.TransactionClient,
+  idempotencyKey: string,
+): Promise<boolean> {
+  const existing = await tx.stockMovement.findUnique({ where: { idempotencyKey } });
+  return existing !== null;
+}
+
+/**
+ * Release reserved units (cancel / payment failure). Predicate is reservedQty >= qty,
+ * not availability — do not copy the reserve statement (architecture.md §5.3.1).
+ */
+export async function releaseTrackedStock(
+  tx: Prisma.TransactionClient,
+  input: ReleaseStockInput,
+): Promise<InventoryRow | 'duplicate'> {
+  if (input.quantity <= 0) {
+    throw new Error('release quantity must be positive');
+  }
+  if (await loadMovement(tx, input.idempotencyKey)) {
+    return 'duplicate';
+  }
+
+  const updated = await tx.$queryRaw<InventoryRow[]>`
+    UPDATE inventory_items
+       SET "reservedQty"   = "reservedQty" - ${input.quantity},
+           "availableQty"  = "availableQty" + ${input.quantity},
+           "isOutOfStock"  = ("availableQty" + ${input.quantity}) <= 0,
+           "isLowStock"    = "trackInventory" AND ("availableQty" + ${input.quantity}) <= "lowStockThreshold",
+           "version"       = "version" + 1,
+           "updatedAt"     = now()
+     WHERE id = ${input.inventoryItemId}
+       AND "reservedQty" >= ${input.quantity}
+    RETURNING id, "onHandQty", "reservedQty", "availableQty", "trackInventory"
+  `;
+  const row = updated[0];
+  if (!row) {
+    const existing = await tx.inventoryItem.findUnique({ where: { id: input.inventoryItemId } });
+    if (!existing) {
+      throw new InventoryInconsistencyError(
+        `inventory item ${input.inventoryItemId} does not exist (zero-row release)`,
+      );
+    }
+    throw new InventoryInconsistencyError(
+      `inventory item ${input.inventoryItemId} cannot release ${input.quantity} (reservedQty=${existing.reservedQty})`,
+    );
+  }
+
+  await tx.stockMovement.create({
+    data: {
+      inventoryItemId: input.inventoryItemId,
+      type: 'RESERVATION_RELEASE',
+      onHandDelta: 0,
+      reservedDelta: -input.quantity,
+      onHandAfter: row.onHandQty,
+      reservedAfter: row.reservedQty,
+      availableAfter: row.availableQty,
+      orderId: input.orderId ?? null,
+      reservationId: input.reservationId ?? null,
+      idempotencyKey: input.idempotencyKey,
+      actorType: 'SYSTEM',
+    },
+  });
+  return row;
+}
+
+/**
+ * Expire a HELD reservation whose expiresAt is in the past. The expiresAt predicate is what
+ * keeps an extended payment-pending hold from being swept at 15 minutes.
+ */
+export async function expireTrackedStock(
+  tx: Prisma.TransactionClient,
+  input: ExpireStockInput,
+): Promise<InventoryRow | 'duplicate' | 'not_due'> {
+  if (input.quantity <= 0) {
+    throw new Error('expire quantity must be positive');
+  }
+  if (await loadMovement(tx, input.idempotencyKey)) {
+    return 'duplicate';
+  }
+
+  const reservation = await tx.$queryRaw<Array<{ id: string }>>`
+    UPDATE stock_reservations
+       SET status = 'EXPIRED',
+           "releasedAt" = now(),
+           "releaseReason" = 'TTL',
+           "updatedAt" = now()
+     WHERE id = ${input.reservationId}
+       AND status = 'HELD'
+       AND "expiresAt" < now()
+    RETURNING id
+  `;
+  if (!reservation[0]) {
+    return 'not_due';
+  }
+
+  const updated = await tx.$queryRaw<InventoryRow[]>`
+    UPDATE inventory_items
+       SET "reservedQty"   = "reservedQty" - ${input.quantity},
+           "availableQty"  = "availableQty" + ${input.quantity},
+           "isOutOfStock"  = ("availableQty" + ${input.quantity}) <= 0,
+           "isLowStock"    = "trackInventory" AND ("availableQty" + ${input.quantity}) <= "lowStockThreshold",
+           "version"       = "version" + 1,
+           "updatedAt"     = now()
+     WHERE id = ${input.inventoryItemId}
+       AND "reservedQty" >= ${input.quantity}
+    RETURNING id, "onHandQty", "reservedQty", "availableQty", "trackInventory"
+  `;
+  const row = updated[0];
+  if (!row) {
+    throw new InventoryInconsistencyError(
+      `inventory item ${input.inventoryItemId} cannot expire ${input.quantity}`,
+    );
+  }
+
+  await tx.stockMovement.create({
+    data: {
+      inventoryItemId: input.inventoryItemId,
+      type: 'RESERVATION_EXPIRY',
+      onHandDelta: 0,
+      reservedDelta: -input.quantity,
+      onHandAfter: row.onHandQty,
+      reservedAfter: row.reservedQty,
+      availableAfter: row.availableQty,
+      orderId: input.orderId ?? null,
+      reservationId: input.reservationId,
+      idempotencyKey: input.idempotencyKey,
+      actorType: 'SYSTEM',
+    },
+  });
+  return row;
+}
+
+/**
+ * Fulfilment: decrement on-hand and reserved together. Available is unchanged.
+ */
+export async function consumeTrackedStock(
+  tx: Prisma.TransactionClient,
+  input: ConsumeStockInput,
+): Promise<InventoryRow | 'duplicate'> {
+  if (input.quantity <= 0) {
+    throw new Error('consume quantity must be positive');
+  }
+  if (await loadMovement(tx, input.idempotencyKey)) {
+    return 'duplicate';
+  }
+
+  const updated = await tx.$queryRaw<InventoryRow[]>`
+    UPDATE inventory_items
+       SET "onHandQty"     = "onHandQty" - ${input.quantity},
+           "reservedQty"   = "reservedQty" - ${input.quantity},
+           "isOutOfStock"  = "availableQty" <= 0,
+           "isLowStock"    = "trackInventory" AND "availableQty" <= "lowStockThreshold",
+           "version"       = "version" + 1,
+           "updatedAt"     = now()
+     WHERE id = ${input.inventoryItemId}
+       AND "onHandQty" >= ${input.quantity}
+       AND "reservedQty" >= ${input.quantity}
+    RETURNING id, "onHandQty", "reservedQty", "availableQty", "trackInventory"
+  `;
+  const row = updated[0];
+  if (!row) {
+    const existing = await tx.inventoryItem.findUnique({ where: { id: input.inventoryItemId } });
+    if (!existing) {
+      throw new InventoryInconsistencyError(
+        `inventory item ${input.inventoryItemId} does not exist (zero-row consume)`,
+      );
+    }
+    throw new InventoryInconsistencyError(
+      `inventory item ${input.inventoryItemId} cannot consume ${input.quantity} ` +
+        `(onHand=${existing.onHandQty}, reserved=${existing.reservedQty})`,
+    );
+  }
+
+  await tx.stockMovement.create({
+    data: {
+      inventoryItemId: input.inventoryItemId,
+      type: 'ORDER_FULFILMENT',
+      onHandDelta: -input.quantity,
+      reservedDelta: -input.quantity,
+      onHandAfter: row.onHandQty,
+      reservedAfter: row.reservedQty,
+      availableAfter: row.availableQty,
+      orderId: input.orderId ?? null,
+      reservationId: input.reservationId ?? null,
+      idempotencyKey: input.idempotencyKey,
+      actorType: 'SYSTEM',
+    },
+  });
+  return row;
+}
+
+export interface AdjustStockInput {
+  inventoryItemId: string;
+  onHandDelta: number;
+  reason: string;
+  idempotencyKey: string;
+  actorAdminUserId?: string | undefined;
+}
+
+/**
+ * Read-then-decide adjustment: SELECT … FOR UPDATE then UPDATE (architecture.md §5.3.1).
+ */
+export async function adjustTrackedStock(
+  tx: Prisma.TransactionClient,
+  input: AdjustStockInput,
+): Promise<InventoryRow> {
+  if (input.onHandDelta === 0) {
+    throw new Error('adjustment delta must be non-zero');
+  }
+  if (!input.reason.trim()) {
+    throw new Error('adjustment reason is mandatory');
+  }
+  if (await loadMovement(tx, input.idempotencyKey)) {
+    const item = await tx.inventoryItem.findUniqueOrThrow({ where: { id: input.inventoryItemId } });
+    return item;
+  }
+
+  const locked = await tx.$queryRaw<InventoryRow[]>`
+    SELECT id, "onHandQty", "reservedQty", "availableQty", "trackInventory"
+      FROM inventory_items
+     WHERE id = ${input.inventoryItemId}
+     FOR UPDATE
+  `;
+  const current = locked[0];
+  if (!current) {
+    throw new InventoryInconsistencyError(
+      `inventory item ${input.inventoryItemId} does not exist (adjust)`,
+    );
+  }
+
+  const updated = await tx.$queryRaw<InventoryRow[]>`
+    UPDATE inventory_items
+       SET "onHandQty"     = "onHandQty" + ${input.onHandDelta},
+           "availableQty"  = "availableQty" + ${input.onHandDelta},
+           "isOutOfStock"  = ("availableQty" + ${input.onHandDelta}) <= 0,
+           "isLowStock"    = "trackInventory" AND ("availableQty" + ${input.onHandDelta}) <= "lowStockThreshold",
+           "version"       = "version" + 1,
+           "updatedAt"     = now()
+     WHERE id = ${input.inventoryItemId}
+       AND "onHandQty" + ${input.onHandDelta} >= 0
+       AND "availableQty" + ${input.onHandDelta} >= 0
+    RETURNING id, "onHandQty", "reservedQty", "availableQty", "trackInventory"
+  `;
+  const row = updated[0];
+  if (!row) {
+    throw new InventoryInconsistencyError(`inventory item ${input.inventoryItemId} adjust failed`);
+  }
+
+  await tx.stockMovement.create({
+    data: {
+      inventoryItemId: input.inventoryItemId,
+      type: 'MANUAL_ADJUSTMENT',
+      onHandDelta: input.onHandDelta,
+      reservedDelta: 0,
+      onHandAfter: row.onHandQty,
+      reservedAfter: row.reservedQty,
+      availableAfter: row.availableQty,
+      reason: input.reason.trim(),
+      idempotencyKey: input.idempotencyKey,
+      actorType: input.actorAdminUserId ? 'ADMIN_USER' : 'SYSTEM',
+      actorAdminUserId: input.actorAdminUserId ?? null,
+    },
+  });
+  return row;
 }

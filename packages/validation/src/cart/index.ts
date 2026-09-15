@@ -12,6 +12,9 @@ export const cartLineIssues = [
   'MISSING_DEFAULT_VARIANT',
   'MISSING_INVENTORY',
   'OUT_OF_STOCK',
+  'PRICE_CHANGED',
+  'QUANTITY_REDUCED',
+  'COUPON_INVALID',
 ] as const;
 export type CartLineIssue = (typeof cartLineIssues)[number];
 
@@ -57,6 +60,13 @@ export function parseCartPreviewRequest(input: unknown): CartPreviewRequest {
 
 export function parseCartPreviewResponse(input: unknown): CartPreviewResponse {
   return cartPreviewResponseSchema.parse(input);
+}
+
+export const createCartRequestSchema = cartPreviewRequestSchema;
+export type CreateCartRequest = CartPreviewRequest;
+
+export function parseCreateCartRequest(input: unknown): CreateCartRequest {
+  return createCartRequestSchema.parse(input);
 }
 
 /** Merge duplicate variant lines and keep request order of first occurrence. */

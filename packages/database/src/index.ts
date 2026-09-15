@@ -16,7 +16,16 @@ export {
   enableInventoryLedger,
   withInventoryTransaction,
   reserveTrackedStock,
+  releaseTrackedStock,
+  expireTrackedStock,
+  consumeTrackedStock,
+  adjustTrackedStock,
   type ReserveStockInput,
+  type ReleaseStockInput,
+  type ExpireStockInput,
+  type ConsumeStockInput,
+  type AdjustStockInput,
+  type InventoryRow,
 } from './inventory.js';
 export {
   ORDER_REFERENCE_SCOPE,

@@ -39,8 +39,9 @@ export interface ClaimGuestOrderInput {
 }
 
 /**
- * Single-use atomic claim. The database trigger additionally rejects an unverified
- * customer email — possession of a token is not verification (coordinator ruling).
+ * Single-use atomic claim. Guest claim V1 is email: the customer row must match the
+ * order email. The database trigger additionally rejects an unverified customer
+ * email — possession of a token is not verification (coordinator ruling).
  *
  * Zero rows is returned as GuestClaimError without distinguishing expired / used /
  * wrong / missing, so the endpoint cannot be used as an oracle for which references exist.
@@ -60,6 +61,9 @@ export async function claimGuestOrder(
        AND "guestClaimTokenHash" = ${tokenHash}
        AND "customerId" IS NULL
        AND "guestClaimTokenExpiresAt" > now()
+       AND lower("email") = (
+         SELECT lower(c.email) FROM customers c WHERE c.id = ${input.customerId}
+       )
     RETURNING id
   `;
   const claimed = rows[0];

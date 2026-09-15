@@ -6,8 +6,10 @@ import type { CartIntentItem, CartLineIssue, CartPreviewLine } from '@kairos/val
 import { classifyAvailability } from '../../catalog/domain/availability.js';
 
 export type CartInventoryRow = {
+  id?: string;
   trackInventory: boolean;
   availableQty: number;
+  onHandQty?: number;
 };
 
 export type CartProductVariantFlag = {
@@ -37,6 +39,8 @@ export type CartVariantRow = {
   name: string;
   sku: string;
   price: number;
+  compareAtPrice?: number | null;
+  cost?: number | null;
   isActive: boolean;
   deletedAt: Date | null;
   inventoryItem: CartInventoryRow | null;
@@ -46,6 +50,11 @@ export type CartVariantRow = {
     name: string;
     status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
     deletedAt: Date | null;
+    description?: string | null;
+    benefits?: string | null;
+    ingredients?: string | null;
+    usage?: string | null;
+    precautions?: string | null;
     images: CartImageRow[];
     variants: CartProductVariantFlag[];
   };
