@@ -159,7 +159,16 @@ export async function createPublicProduct(
 }
 
 export async function deleteProduct(client: PrismaClient, productId: string): Promise<void> {
-  await client.product.delete({ where: { id: productId } }).catch(() => undefined);
+  try {
+    await client.product.delete({ where: { id: productId } });
+  } catch {
+    await client.product
+      .update({
+        where: { id: productId },
+        data: { status: 'ARCHIVED', deletedAt: new Date() },
+      })
+      .catch(() => undefined);
+  }
 }
 
 export async function createActiveDelivery(

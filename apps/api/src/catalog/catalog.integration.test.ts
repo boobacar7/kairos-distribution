@@ -204,7 +204,7 @@ describe('catalog API', () => {
 
     const inStockFilter = await request(app.getHttpServer())
       .get('/v1/products')
-      .query({ availability: 'in_stock', q: '[TEST]' })
+      .query({ availability: 'in_stock', q: '[TEST]', limit: 100 })
       .expect(200);
     const inStockSlugs = (inStockFilter.body.data as Array<{ slug: string }>).map(
       (row) => row.slug,
@@ -215,7 +215,7 @@ describe('catalog API', () => {
 
     const outFilter = await request(app.getHttpServer())
       .get('/v1/products')
-      .query({ availability: 'out_of_stock', q: '[TEST]' })
+      .query({ availability: 'out_of_stock', q: '[TEST]', limit: 100 })
       .expect(200);
     const outSlugs = (outFilter.body.data as Array<{ slug: string }>).map((row) => row.slug);
     expect(outSlugs).toContain(out.slug);

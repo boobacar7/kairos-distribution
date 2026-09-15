@@ -46,7 +46,7 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^test"],
       "inputs": [
         "src/**",
         "app/**",
